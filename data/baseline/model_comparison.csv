@@ -1,0 +1,5 @@
+model,mae,mse,rmse,r2,accuracy,f1
+GRU,0.3594,0.1292,0.3594,0.0,0.0,0.0
+Persistence,0.0,0.0,0.0,0.0,1.0,0.3333
+MovingAverage,0.0,0.0,0.0,0.0,1.0,0.3333
+LinearTrend,0.0,0.0,0.0,0.0,1.0,0.3333

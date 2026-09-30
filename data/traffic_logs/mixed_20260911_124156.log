@@ -1,0 +1,35 @@
+Traffic Scenario Execution Log: MIXED
+Timestamp: 20260911_124156
+============================================================
+Flow ID   : mixed_udp_4
+Route     : h4 (192.168.1.13) -> h1 (192.168.1.10:5223)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 9.8 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : mixed_tcp_3
+Route     : h5 (192.168.1.14) -> h2 (192.168.1.11:5222)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 94.5 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : mixed_udp_2
+Route     : h3 (192.168.1.12) -> h4 (192.168.1.13:5221)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 9.8 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : mixed_tcp_1
+Route     : h1 (192.168.1.10) -> h2 (192.168.1.11:5220)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 94.5 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------

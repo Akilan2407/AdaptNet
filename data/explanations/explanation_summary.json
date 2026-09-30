@@ -1,0 +1,42 @@
+{
+  "total_traces": 53,
+  "successful_explanations": 3,
+  "partial_explanations": 50,
+  "skipped_explanations": 0,
+  "failed_explanations": 0,
+  "prediction_explanation_coverage": 11.32,
+  "policy_explanation_coverage": 100.0,
+  "control_explanation_coverage": 5.66,
+  "top_features": [
+    {
+      "feature_name": "cluster_id",
+      "mean_absolute_shap": 0.006906
+    },
+    {
+      "feature_name": "total_flow_count",
+      "mean_absolute_shap": 0.005214
+    },
+    {
+      "feature_name": "throughput_mbps",
+      "mean_absolute_shap": 0.0
+    },
+    {
+      "feature_name": "rtt_ms",
+      "mean_absolute_shap": 0.0
+    },
+    {
+      "feature_name": "packet_loss_percent",
+      "mean_absolute_shap": 0.0
+    }
+  ],
+  "traffic_class_distribution": {
+    "BULK_TRANSFER": 53
+  },
+  "priority_distribution": {
+    "LOW": 53
+  },
+  "control_status_distribution": {
+    "SKIPPED": 50,
+    "DRY_RUN": 3
+  }
+}

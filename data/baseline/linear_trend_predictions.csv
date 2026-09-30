@@ -1,0 +1,4 @@
+timestamp,device_id,actual_congestion_score,predicted_congestion_score,actual_congestion_class,predicted_congestion_class,absolute_error
+2026-09-12 16:01:28,h4,0.0,0.0,LOW,LOW,0.0
+2026-09-12 16:01:28,h5,0.0,0.0,LOW,LOW,0.0
+2026-09-12 16:01:29,h1,0.0,0.0,LOW,LOW,0.0

@@ -1,0 +1,21 @@
+{
+  "total_decisions": 53,
+  "priority_distribution": {
+    "LOW": 53
+  },
+  "traffic_class_distribution": {
+    "BULK_TRANSFER": 53
+  },
+  "congestion_distribution": {
+    "UNKNOWN": 48,
+    "MEDIUM": 5
+  },
+  "rule_usage": {
+    "POLICY_UNKNOWN_CONGESTION_FALLBACK": 48,
+    "POLICY_BULK_MED_CONGESTION": 5
+  },
+  "input_completeness": {
+    "PARTIAL": 48,
+    "COMPLETE": 5
+  }
+}

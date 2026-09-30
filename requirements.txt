@@ -1,0 +1,24 @@
+# Core Backend & API
+Flask>=3.0.0
+flask-cors>=4.0.0
+requests>=2.31.0
+
+# Scientific & Data Processing
+numpy>=1.26.0
+pandas>=2.1.0
+scipy>=1.11.0
+
+# Machine Learning (Profiling & Explainability)
+scikit-learn>=1.4.0
+shap>=0.45.0
+
+# Deep Learning (Congestion Prediction - GRU / Keras)
+tensorflow>=2.16.0
+
+# Visualization & Reporting
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Testing & Quality
+pytest>=8.0.0
+pytest-cov>=4.1.0

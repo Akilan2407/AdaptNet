@@ -1,0 +1,16 @@
+{
+  "total_decisions": 53,
+  "total_applied": 3,
+  "total_updated": 0,
+  "total_removed": 0,
+  "total_skipped": 50,
+  "total_failed": 0,
+  "dry_run_operations": 3,
+  "priority_distribution": {
+    "HIGH": 0,
+    "MEDIUM": 0,
+    "NORMAL": 0,
+    "LOW": 53
+  },
+  "control_success_rate": 100.0
+}

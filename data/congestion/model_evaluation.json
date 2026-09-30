@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-09-23T06:46:08.274681+00:00",
+  "phase": 10,
+  "model_name": "gru_congestion_predictor",
+  "test_sample_count": 3,
+  "regression_metrics": {
+    "mae": 0.3594,
+    "mse": 0.1292,
+    "rmse": 0.3594,
+    "r2": 0.0,
+    "max_error": 0.3644
+  },
+  "classification_metrics": {
+    "accuracy": 0.0,
+    "precision_macro": 0.0,
+    "recall_macro": 0.0,
+    "f1_macro": 0.0,
+    "confusion_matrix": [
+      [
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "classes": [
+      "LOW",
+      "MEDIUM",
+      "HIGH"
+    ]
+  },
+  "comparison_vs_persistence": {
+    "gru_mae": 0.3594,
+    "persistence_mae": 0.0,
+    "mae_delta": 0.3594,
+    "gru_mse": 0.1292,
+    "persistence_mse": 0.0,
+    "gru_better_than_persistence": false
+  },
+  "comparison_vs_mean_baseline": {
+    "gru_mae": 0.3594,
+    "mean_mae": 0.0,
+    "mae_delta": 0.3594,
+    "gru_better_than_mean": false
+  }
+}

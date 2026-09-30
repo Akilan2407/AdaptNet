@@ -1,0 +1,4 @@
+sequence_id,device_id,prediction_timestamp,actual_score,predicted_score,actual_class,predicted_class,absolute_error
+10,h4,2026-09-12 16:01:28,0.0,0.3604,LOW,MEDIUM,0.3604
+11,h5,2026-09-12 16:01:28,0.0,0.3534,LOW,MEDIUM,0.3534
+12,h1,2026-09-12 16:01:29,0.0,0.3644,LOW,MEDIUM,0.3644

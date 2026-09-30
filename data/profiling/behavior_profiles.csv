@@ -1,0 +1,6 @@
+device_id,cluster_id,profile_label,mean_throughput_mbps,max_throughput_mbps,min_throughput_mbps,throughput_std,mean_rtt_ms,max_rtt_ms,rtt_std,mean_packet_loss_percent,max_packet_loss_percent,packet_loss_std,mean_active_connections,total_flow_count,tcp_flow_count,udp_flow_count,tcp_flow_ratio,udp_flow_ratio,active_hours_count
+h1,1,High-Flow-Activity,0.0,0.0,0.0,0.0,0.0,,0.0,0.0,,0.0,0.0,22,22,0,1.0,0.0,2
+h2,0,Low-Activity,0.0,0.0,0.0,0.0,0.0,,0.0,0.0,,0.0,0.0,8,8,0,1.0,0.0,2
+h3,0,Low-Activity,0.0,0.0,0.0,0.0,0.0,,0.0,0.0,,0.0,0.0,8,8,0,1.0,0.0,2
+h4,0,Low-Activity,0.0,0.0,0.0,0.0,0.0,,0.0,0.0,,0.0,0.0,8,8,0,1.0,0.0,2
+h5,0,Low-Activity,0.0,0.0,0.0,0.0,0.0,,0.0,0.0,,0.0,0.0,7,7,0,1.0,0.0,2

@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-09-23T06:46:03.882509+00:00",
+  "phase": 10,
+  "model_architecture": "GRU",
+  "model_name": "gru_congestion_predictor",
+  "input_shape": [
+    2,
+    11
+  ],
+  "timesteps": 2,
+  "features_per_step": 11,
+  "feature_columns": [
+    "cluster_id",
+    "throughput_mbps",
+    "rtt_ms",
+    "packet_loss_percent",
+    "active_connections",
+    "throughput_std",
+    "rtt_std",
+    "packet_loss_std",
+    "total_flow_count",
+    "tcp_flow_ratio",
+    "udp_flow_ratio",
+    "hist_mean_throughput_mbps",
+    "hist_mean_rtt_ms",
+    "hist_mean_packet_loss_percent",
+    "hist_mean_active_connections",
+    "hist_mean_throughput_std",
+    "hist_mean_rtt_std",
+    "hist_mean_packet_loss_std",
+    "hist_mean_total_flow_count",
+    "hist_mean_tcp_flow_ratio",
+    "hist_mean_udp_flow_ratio"
+  ],
+  "hyperparameters": {
+    "gru_units": 64,
+    "dense_units": 32,
+    "dropout_rate": 0.2,
+    "learning_rate": 0.001,
+    "max_epochs": 30,
+    "epochs_trained": 30,
+    "effective_batch_size": 9,
+    "early_stopping_patience": 8,
+    "random_seed": 42
+  },
+  "dataset_sample_counts": {
+    "train": 9,
+    "validation": 1,
+    "test": 3
+  },
+  "training_results": {
+    "final_train_loss_mse": 0.017461,
+    "final_train_mae": 0.074085,
+    "final_val_loss_mse": 0.14005,
+    "final_val_mae": 0.360409,
+    "best_epoch": 30
+  },
+  "overfitting_assessment": {
+    "status": "WARNING_HIGH_VAL_LOSS",
+    "notes": "Validation loss (0.1401) is more than 2x training loss (0.0175). Characteristic of small LAN dataset sample size."
+  },
+  "artifacts": {
+    "model_file": "/Users/shivabalan/Desktop/Networks_Project/data/congestion/gru_congestion_model.keras",
+    "scaler_file": "/Users/shivabalan/Desktop/Networks_Project/data/congestion/congestion_scaler.pkl",
+    "loss_plot": "/Users/shivabalan/Desktop/Networks_Project/data/congestion/training_loss.png"
+  },
+  "parameter_counts": {
+    "total": 17153,
+    "trainable": 17025,
+    "non_trainable": 128
+  }
+}

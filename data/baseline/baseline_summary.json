@@ -1,0 +1,194 @@
+{
+  "timestamp": "2026-09-23T07:06:02.665529+00:00",
+  "phase": 11,
+  "total_test_samples": 3,
+  "valid_samples": 3,
+  "discarded_samples": 0,
+  "prediction_horizon_seconds": 30,
+  "history_window_seconds": 30,
+  "moving_average_window": 5,
+  "baseline_predictions_count": {
+    "persistence": 3,
+    "moving_average": 3,
+    "linear_trend": 3
+  },
+  "metrics": {
+    "persistence": {
+      "name": "Persistence",
+      "regression": {
+        "mae": 0.0,
+        "mse": 0.0,
+        "rmse": 0.0,
+        "r2": 0.0,
+        "max_error": 0.0
+      },
+      "classification": {
+        "accuracy": 1.0,
+        "precision_macro": 0.3333,
+        "recall_macro": 0.3333,
+        "f1": 0.3333,
+        "f1_macro": 0.3333,
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "mae": 0.0,
+      "mse": 0.0,
+      "rmse": 0.0,
+      "r2": 0.0,
+      "accuracy": 1.0,
+      "f1": 0.3333
+    },
+    "moving_average": {
+      "name": "MovingAverage",
+      "window_size": 5,
+      "regression": {
+        "mae": 0.0,
+        "mse": 0.0,
+        "rmse": 0.0,
+        "r2": 0.0,
+        "max_error": 0.0
+      },
+      "classification": {
+        "accuracy": 1.0,
+        "precision_macro": 0.3333,
+        "recall_macro": 0.3333,
+        "f1": 0.3333,
+        "f1_macro": 0.3333,
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "mae": 0.0,
+      "mse": 0.0,
+      "rmse": 0.0,
+      "r2": 0.0,
+      "accuracy": 1.0,
+      "f1": 0.3333
+    },
+    "linear_trend": {
+      "name": "LinearTrend",
+      "regression": {
+        "mae": 0.0,
+        "mse": 0.0,
+        "rmse": 0.0,
+        "r2": 0.0,
+        "max_error": 0.0
+      },
+      "classification": {
+        "accuracy": 1.0,
+        "precision_macro": 0.3333,
+        "recall_macro": 0.3333,
+        "f1": 0.3333,
+        "f1_macro": 0.3333,
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "mae": 0.0,
+      "mse": 0.0,
+      "rmse": 0.0,
+      "r2": 0.0,
+      "accuracy": 1.0,
+      "f1": 0.3333
+    }
+  },
+  "gru_comparison": {
+    "persistence": {
+      "delta_mae_gru_minus_baseline": 0.3594,
+      "delta_mse_gru_minus_baseline": 0.1292,
+      "delta_rmse_gru_minus_baseline": 0.3594,
+      "delta_r2_gru_minus_baseline": 0.0,
+      "delta_accuracy_gru_minus_baseline": -1.0,
+      "delta_f1_gru_minus_baseline": -0.3333,
+      "pct_mae_improvement_over_baseline": null,
+      "pct_rmse_improvement_over_baseline": null,
+      "baseline_metrics": {
+        "mae": 0.0,
+        "mse": 0.0,
+        "rmse": 0.0,
+        "r2": 0.0,
+        "accuracy": 1.0,
+        "f1": 0.3333
+      }
+    },
+    "moving_average": {
+      "delta_mae_gru_minus_baseline": 0.3594,
+      "delta_mse_gru_minus_baseline": 0.1292,
+      "delta_rmse_gru_minus_baseline": 0.3594,
+      "delta_r2_gru_minus_baseline": 0.0,
+      "delta_accuracy_gru_minus_baseline": -1.0,
+      "delta_f1_gru_minus_baseline": -0.3333,
+      "pct_mae_improvement_over_baseline": null,
+      "pct_rmse_improvement_over_baseline": null,
+      "baseline_metrics": {
+        "mae": 0.0,
+        "mse": 0.0,
+        "rmse": 0.0,
+        "r2": 0.0,
+        "accuracy": 1.0,
+        "f1": 0.3333
+      }
+    },
+    "linear_trend": {
+      "delta_mae_gru_minus_baseline": 0.3594,
+      "delta_mse_gru_minus_baseline": 0.1292,
+      "delta_rmse_gru_minus_baseline": 0.3594,
+      "delta_r2_gru_minus_baseline": 0.0,
+      "delta_accuracy_gru_minus_baseline": -1.0,
+      "delta_f1_gru_minus_baseline": -0.3333,
+      "pct_mae_improvement_over_baseline": null,
+      "pct_rmse_improvement_over_baseline": null,
+      "baseline_metrics": {
+        "mae": 0.0,
+        "mse": 0.0,
+        "rmse": 0.0,
+        "r2": 0.0,
+        "accuracy": 1.0,
+        "f1": 0.3333
+      }
+    }
+  }
+}

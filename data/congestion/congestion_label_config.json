@@ -1,0 +1,35 @@
+{
+  "description": "Dataset-derived multi-factor congestion scoring formula and class thresholds",
+  "formula": "score = (w_loss * L_loss) + (w_rtt * L_rtt) + (w_tp * L_tp) + (w_conn * L_conn)",
+  "score_range": [
+    0.0,
+    1.0
+  ],
+  "weights": {
+    "packet_loss": 0.35,
+    "rtt": 0.3,
+    "throughput": 0.25,
+    "active_connections": 0.1
+  },
+  "baselines": {
+    "nominal_bandwidth_mbps": 100.0,
+    "base_rtt_ms": 2.0,
+    "max_rtt_ms": 100.0,
+    "max_packet_loss_pct": 10.0,
+    "max_active_connections": 20
+  },
+  "class_thresholds": {
+    "LOW": [
+      0.0,
+      0.33
+    ],
+    "MEDIUM": [
+      0.33,
+      0.67
+    ],
+    "HIGH": [
+      0.67,
+      1.0
+    ]
+  }
+}

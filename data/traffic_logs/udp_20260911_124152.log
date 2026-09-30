@@ -1,0 +1,11 @@
+Traffic Scenario Execution Log: UDP
+Timestamp: 20260911_124152
+============================================================
+Flow ID   : flow_udp_1
+Route     : h1 (192.168.1.10) -> h2 (192.168.1.11:5202)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 9.8 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------

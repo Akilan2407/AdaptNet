@@ -1,0 +1,45 @@
+{
+  "explainer_type": "GradientExplainer",
+  "model_name": "gru_congestion_predictor",
+  "model_version": "Phase 10 GRU",
+  "number_of_samples": 53,
+  "number_of_successful_explanations": 6,
+  "number_of_skipped_explanations": 47,
+  "number_of_failed_explanations": 0,
+  "feature_count": 11,
+  "top_features": [
+    {
+      "feature_name": "cluster_id",
+      "mean_absolute_shap": 0.007488,
+      "rank": 1
+    },
+    {
+      "feature_name": "total_flow_count",
+      "mean_absolute_shap": 0.003433,
+      "rank": 2
+    },
+    {
+      "feature_name": "throughput_mbps",
+      "mean_absolute_shap": 0.0,
+      "rank": 3
+    },
+    {
+      "feature_name": "rtt_ms",
+      "mean_absolute_shap": 0.0,
+      "rank": 4
+    },
+    {
+      "feature_name": "packet_loss_percent",
+      "mean_absolute_shap": 0.0,
+      "rank": 5
+    }
+  ],
+  "additivity_validation": {
+    "passed": true,
+    "tolerance": 0.25
+  },
+  "prediction_consistency_validation": {
+    "passed": true,
+    "tolerance": 0.05
+  }
+}

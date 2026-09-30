@@ -1,0 +1,27 @@
+Traffic Scenario Execution Log: MULTI_TCP
+Timestamp: 20260911_124153
+============================================================
+Flow ID   : multi_tcp_1
+Route     : h1 (192.168.1.10) -> h2 (192.168.1.11:5201)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 94.5 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : multi_tcp_2
+Route     : h3 (192.168.1.12) -> h4 (192.168.1.13:5202)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 94.5 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : multi_tcp_3
+Route     : h5 (192.168.1.14) -> h2 (192.168.1.11:5203)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 94.5 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------

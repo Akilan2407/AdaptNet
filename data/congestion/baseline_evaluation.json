@@ -1,0 +1,79 @@
+{
+  "persistence_baseline": {
+    "regression": {
+      "mae": 0.0,
+      "mse": 0.0,
+      "rmse": 0.0,
+      "r2": 0.0,
+      "max_error": 0.0
+    },
+    "classification": {
+      "accuracy": 1.0,
+      "precision_macro": 0.3333,
+      "recall_macro": 0.3333,
+      "f1_macro": 0.3333,
+      "confusion_matrix": [
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "classes": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ]
+    },
+    "description": "Predicts current anchor congestion score as future score."
+  },
+  "mean_baseline": {
+    "train_mean_score": 0.0,
+    "regression": {
+      "mae": 0.0,
+      "mse": 0.0,
+      "rmse": 0.0,
+      "r2": 0.0,
+      "max_error": 0.0
+    },
+    "classification": {
+      "accuracy": 1.0,
+      "precision_macro": 0.3333,
+      "recall_macro": 0.3333,
+      "f1_macro": 0.3333,
+      "confusion_matrix": [
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "classes": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ]
+    },
+    "description": "Predicts historical training mean score as future score."
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "scenario": "multi_tcp",
+  "timestamp": "20260911_124153",
+  "flow_count": 3,
+  "results": [
+    {
+      "flow_id": "multi_tcp_1",
+      "src_host": "h1",
+      "src_ip": "192.168.1.10",
+      "dst_host": "h2",
+      "dst_ip": "192.168.1.11",
+      "protocol": "tcp",
+      "port": 5201,
+      "duration": 1,
+      "bandwidth_target": "auto",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 94.5,
+      "packet_loss_pct": 0.0,
+      "timestamp": "2026-09-11T12:41:52.751545"
+    },
+    {
+      "flow_id": "multi_tcp_2",
+      "src_host": "h3",
+      "src_ip": "192.168.1.12",
+      "dst_host": "h4",
+      "dst_ip": "192.168.1.13",
+      "protocol": "tcp",
+      "port": 5202,
+      "duration": 1,
+      "bandwidth_target": "auto",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 94.5,
+      "packet_loss_pct": 0.0,
+      "timestamp": "2026-09-11T12:41:52.751812"
+    },
+    {
+      "flow_id": "multi_tcp_3",
+      "src_host": "h5",
+      "src_ip": "192.168.1.14",
+      "dst_host": "h2",
+      "dst_ip": "192.168.1.11",
+      "protocol": "tcp",
+      "port": 5203,
+      "duration": 1,
+      "bandwidth_target": "auto",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 94.5,
+      "packet_loss_pct": 0.0,
+      "timestamp": "2026-09-11T12:41:52.752073"
+    }
+  ]
+}

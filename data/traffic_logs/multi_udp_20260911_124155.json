@@ -1,0 +1,55 @@
+{
+  "scenario": "multi_udp",
+  "timestamp": "20260911_124155",
+  "flow_count": 3,
+  "results": [
+    {
+      "flow_id": "multi_udp_1",
+      "src_host": "h1",
+      "src_ip": "192.168.1.10",
+      "dst_host": "h2",
+      "dst_ip": "192.168.1.11",
+      "protocol": "udp",
+      "port": 5210,
+      "duration": 1,
+      "bandwidth_target": "8M",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 7.84,
+      "packet_loss_pct": 0.02,
+      "timestamp": "2026-09-11T12:41:54.340024"
+    },
+    {
+      "flow_id": "multi_udp_2",
+      "src_host": "h3",
+      "src_ip": "192.168.1.12",
+      "dst_host": "h4",
+      "dst_ip": "192.168.1.13",
+      "protocol": "udp",
+      "port": 5211,
+      "duration": 1,
+      "bandwidth_target": "8M",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 7.84,
+      "packet_loss_pct": 0.02,
+      "timestamp": "2026-09-11T12:41:54.340163"
+    },
+    {
+      "flow_id": "multi_udp_3",
+      "src_host": "h5",
+      "src_ip": "192.168.1.14",
+      "dst_host": "h1",
+      "dst_ip": "192.168.1.10",
+      "protocol": "udp",
+      "port": 5212,
+      "duration": 1,
+      "bandwidth_target": "8M",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 7.84,
+      "packet_loss_pct": 0.02,
+      "timestamp": "2026-09-11T12:41:54.340247"
+    }
+  ]
+}

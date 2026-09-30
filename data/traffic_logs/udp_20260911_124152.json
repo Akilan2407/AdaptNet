@@ -1,0 +1,23 @@
+{
+  "scenario": "udp",
+  "timestamp": "20260911_124152",
+  "flow_count": 1,
+  "results": [
+    {
+      "flow_id": "flow_udp_1",
+      "src_host": "h1",
+      "src_ip": "192.168.1.10",
+      "dst_host": "h2",
+      "dst_ip": "192.168.1.11",
+      "protocol": "udp",
+      "port": 5202,
+      "duration": 1,
+      "bandwidth_target": "10M",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 9.8,
+      "packet_loss_pct": 0.02,
+      "timestamp": "2026-09-11T12:41:51.157845"
+    }
+  ]
+}

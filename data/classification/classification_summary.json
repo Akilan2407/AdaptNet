@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-09-23T12:13:59.897477+00:00",
+  "phase": 12,
+  "total_flows": 53,
+  "classified_flows": 53,
+  "unknown_flows": 0,
+  "average_confidence": 1.0,
+  "classification_distribution": {
+    "INTERACTIVE": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "REAL_TIME": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "BULK_TRANSFER": {
+      "count": 53,
+      "percentage": 100.0
+    },
+    "WEB": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "DNS": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "OTHER": {
+      "count": 0,
+      "percentage": 0.0
+    }
+  },
+  "protocol_distribution": {
+    "TCP": 53
+  },
+  "output_file": "/Users/shivabalan/Desktop/Networks_Project/data/classification/classified_flows.csv"
+}

@@ -1,0 +1,35 @@
+Traffic Scenario Execution Log: CONGESTION
+Timestamp: 20260911_124158
+============================================================
+Flow ID   : congest_bulk_tcp_1
+Route     : h1 (192.168.1.10) -> h2 (192.168.1.11:5230)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 378.0 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : congest_bulk_tcp_3
+Route     : h4 (192.168.1.13) -> h2 (192.168.1.11:5232)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 189.0 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : congest_flood_udp_4
+Route     : h5 (192.168.1.14) -> h2 (192.168.1.11:5233)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 78.4 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : congest_flood_udp_2
+Route     : h3 (192.168.1.12) -> h2 (192.168.1.11:5231)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 78.4 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------

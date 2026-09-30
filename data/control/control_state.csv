@@ -1,0 +1,4 @@
+timestamp,device_id,flow_id,interface,priority,traffic_class,control_class,action,status,rule_identifier,dry_run,error_message
+2026-09-12 16:01:27,h1,h1_192.168.1.10:45672->192.168.1.11:5201_TCP,s1-eth1,LOW,BULK_TRANSFER,1:40,APPLY,DRY_RUN,s1-eth1_0x100_1:40,True,
+2026-09-12 16:01:28,h4,h4_192.168.1.13:45672->192.168.1.14:5201_TCP,s1-eth4,LOW,BULK_TRANSFER,1:40,APPLY,DRY_RUN,s1-eth4_0x101_1:40,True,
+2026-09-12 16:01:28,h5,h5_192.168.1.14:45672->192.168.1.10:5201_TCP,s1-eth5,LOW,BULK_TRANSFER,1:40,APPLY,DRY_RUN,s1-eth5_0x102_1:40,True,

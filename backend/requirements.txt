@@ -1,0 +1,6 @@
+# Phase 18 Backend REST API Requirements
+Flask>=3.0.0,<4.0.0
+Flask-Cors>=4.0.0,<7.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+pytest>=8.0.0

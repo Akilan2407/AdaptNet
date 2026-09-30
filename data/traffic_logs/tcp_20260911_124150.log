@@ -1,0 +1,11 @@
+Traffic Scenario Execution Log: TCP
+Timestamp: 20260911_124150
+============================================================
+Flow ID   : flow_tcp_1
+Route     : h1 (192.168.1.10) -> h2 (192.168.1.11:5201)
+Protocol  : TCP
+Duration  : 1s
+Bitrate   : 94.5 Mbps
+Loss Pct  : 0.0%
+Status    : completed
+------------------------------------------------------------

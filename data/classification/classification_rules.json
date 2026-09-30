@@ -1,0 +1,100 @@
+{
+  "description": "Configurable port and protocol rules for traffic classification",
+  "rule_priority": [
+    "DNS",
+    "REAL_TIME",
+    "WEB",
+    "INTERACTIVE",
+    "BULK_TRANSFER",
+    "OTHER"
+  ],
+  "traffic_classes": [
+    "INTERACTIVE",
+    "REAL_TIME",
+    "BULK_TRANSFER",
+    "WEB",
+    "DNS",
+    "OTHER"
+  ],
+  "port_rules": {
+    "DNS": {
+      "protocols": [
+        "UDP",
+        "TCP"
+      ],
+      "ports": [
+        53
+      ],
+      "ranges": [],
+      "description": "Domain Name System resolution traffic"
+    },
+    "REAL_TIME": {
+      "protocols": [
+        "UDP"
+      ],
+      "ports": [
+        5004,
+        5005,
+        5060,
+        5061
+      ],
+      "ranges": [
+        [
+          3478,
+          3481
+        ],
+        [
+          5000,
+          6000
+        ]
+      ],
+      "description": "Real-time communication, STUN/TURN, SIP, and RTP audio/video streams"
+    },
+    "WEB": {
+      "protocols": [
+        "TCP"
+      ],
+      "ports": [
+        80,
+        443,
+        8080,
+        8443
+      ],
+      "ranges": [],
+      "description": "Standard HTTP, HTTPS, and web alternate communication"
+    },
+    "INTERACTIVE": {
+      "protocols": [
+        "TCP"
+      ],
+      "ports": [
+        22,
+        23,
+        3389,
+        5900
+      ],
+      "ranges": [],
+      "description": "Interactive shell and remote desktop sessions (SSH, Telnet, RDP, VNC)"
+    },
+    "BULK_TRANSFER": {
+      "protocols": [
+        "TCP"
+      ],
+      "ports": [
+        20,
+        21,
+        445,
+        5201,
+        873
+      ],
+      "ranges": [],
+      "description": "Bulk data, file transfer, SMB, rsync, and sustained throughput benchmarks (iPerf3)"
+    }
+  },
+  "confidence_levels": {
+    "exact_port": 1.0,
+    "port_range": 0.85,
+    "secondary_feature": 0.7,
+    "unknown": 0.0
+  }
+}

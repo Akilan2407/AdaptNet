@@ -1,0 +1,12 @@
+feature_name,mean_absolute_shap,mean_signed_shap,median_absolute_shap,sample_count,rank
+cluster_id,0.007488,-0.000629,0.006688,13,1
+total_flow_count,0.003433,-0.001235,0.00286,13,2
+throughput_mbps,0.0,0.0,0.0,13,3
+rtt_ms,0.0,0.0,0.0,13,4
+packet_loss_percent,0.0,0.0,0.0,13,5
+active_connections,0.0,0.0,0.0,13,6
+throughput_std,0.0,0.0,0.0,13,7
+rtt_std,0.0,0.0,0.0,13,8
+packet_loss_std,0.0,0.0,0.0,13,9
+tcp_flow_ratio,0.0,0.0,0.0,13,10
+udp_flow_ratio,0.0,0.0,0.0,13,11

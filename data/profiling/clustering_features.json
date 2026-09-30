@@ -1,0 +1,18 @@
+{
+  "num_features": 10,
+  "features": [
+    "mean_throughput_mbps",
+    "mean_rtt_ms",
+    "mean_packet_loss_percent",
+    "mean_active_connections",
+    "total_flow_count",
+    "tcp_flow_ratio",
+    "udp_flow_ratio",
+    "throughput_std",
+    "rtt_std",
+    "active_hours_count"
+  ],
+  "algorithm": "KMeans",
+  "n_clusters": 2,
+  "random_state": 42
+}

@@ -1,0 +1,102 @@
+{
+  "total_records": 53,
+  "valid_records": 53,
+  "removed_records": 0,
+  "sequence_count": 13,
+  "training_samples": 9,
+  "validation_samples": 1,
+  "test_samples": 3,
+  "feature_count": 21,
+  "features": [
+    "cluster_id",
+    "throughput_mbps",
+    "hist_mean_throughput_mbps",
+    "rtt_ms",
+    "hist_mean_rtt_ms",
+    "packet_loss_percent",
+    "hist_mean_packet_loss_percent",
+    "active_connections",
+    "hist_mean_active_connections",
+    "throughput_std",
+    "hist_mean_throughput_std",
+    "rtt_std",
+    "hist_mean_rtt_std",
+    "packet_loss_std",
+    "hist_mean_packet_loss_std",
+    "total_flow_count",
+    "hist_mean_total_flow_count",
+    "tcp_flow_ratio",
+    "hist_mean_tcp_flow_ratio",
+    "udp_flow_ratio",
+    "hist_mean_udp_flow_ratio"
+  ],
+  "missing_value_statistics": {
+    "throughput_mbps": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    },
+    "rtt_ms": {
+      "null_count": 53,
+      "null_percentage": 100.0,
+      "strategy": "100% missing, imputed baseline 0.0"
+    },
+    "packet_loss_percent": {
+      "null_count": 53,
+      "null_percentage": 100.0,
+      "strategy": "100% missing, imputed baseline 0.0"
+    },
+    "active_connections": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    },
+    "throughput_std": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    },
+    "rtt_std": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    },
+    "packet_loss_std": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    },
+    "total_flow_count": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    },
+    "tcp_flow_ratio": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    },
+    "udp_flow_ratio": {
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
+    }
+  },
+  "class_distribution": {
+    "LOW": 13,
+    "MEDIUM": 0,
+    "HIGH": 0
+  },
+  "time_range": {
+    "start": "2026-09-12 15:24:45",
+    "end": "2026-09-12 16:01:29"
+  },
+  "sampling_interval": {
+    "median_interval_seconds": 29.5,
+    "min_interval_seconds": 1.0,
+    "max_interval_seconds": 1628.0,
+    "is_regular": false
+  },
+  "history_window": 30,
+  "prediction_horizon": 30
+}

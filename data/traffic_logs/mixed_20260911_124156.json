@@ -1,0 +1,71 @@
+{
+  "scenario": "mixed",
+  "timestamp": "20260911_124156",
+  "flow_count": 4,
+  "results": [
+    {
+      "flow_id": "mixed_udp_4",
+      "src_host": "h4",
+      "src_ip": "192.168.1.13",
+      "dst_host": "h1",
+      "dst_ip": "192.168.1.10",
+      "protocol": "udp",
+      "port": 5223,
+      "duration": 1,
+      "bandwidth_target": "10M",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 9.8,
+      "packet_loss_pct": 0.02,
+      "timestamp": "2026-09-11T12:41:55.930214"
+    },
+    {
+      "flow_id": "mixed_tcp_3",
+      "src_host": "h5",
+      "src_ip": "192.168.1.14",
+      "dst_host": "h2",
+      "dst_ip": "192.168.1.11",
+      "protocol": "tcp",
+      "port": 5222,
+      "duration": 1,
+      "bandwidth_target": "auto",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 94.5,
+      "packet_loss_pct": 0.0,
+      "timestamp": "2026-09-11T12:41:55.930127"
+    },
+    {
+      "flow_id": "mixed_udp_2",
+      "src_host": "h3",
+      "src_ip": "192.168.1.12",
+      "dst_host": "h4",
+      "dst_ip": "192.168.1.13",
+      "protocol": "udp",
+      "port": 5221,
+      "duration": 1,
+      "bandwidth_target": "10M",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 9.8,
+      "packet_loss_pct": 0.02,
+      "timestamp": "2026-09-11T12:41:55.930016"
+    },
+    {
+      "flow_id": "mixed_tcp_1",
+      "src_host": "h1",
+      "src_ip": "192.168.1.10",
+      "dst_host": "h2",
+      "dst_ip": "192.168.1.11",
+      "protocol": "tcp",
+      "port": 5220,
+      "duration": 1,
+      "bandwidth_target": "auto",
+      "parallel_streams": 1,
+      "status": "completed",
+      "throughput_mbps": 94.5,
+      "packet_loss_pct": 0.0,
+      "timestamp": "2026-09-11T12:41:55.929840"
+    }
+  ]
+}

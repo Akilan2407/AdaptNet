@@ -1,0 +1,27 @@
+Traffic Scenario Execution Log: MULTI_UDP
+Timestamp: 20260911_124155
+============================================================
+Flow ID   : multi_udp_1
+Route     : h1 (192.168.1.10) -> h2 (192.168.1.11:5210)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 7.84 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : multi_udp_2
+Route     : h3 (192.168.1.12) -> h4 (192.168.1.13:5211)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 7.84 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------
+Flow ID   : multi_udp_3
+Route     : h5 (192.168.1.14) -> h1 (192.168.1.10:5212)
+Protocol  : UDP
+Duration  : 1s
+Bitrate   : 7.84 Mbps
+Loss Pct  : 0.02%
+Status    : completed
+------------------------------------------------------------
