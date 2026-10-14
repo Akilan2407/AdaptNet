@@ -3,6 +3,7 @@ import { getCongestionPredictions, getCongestionSummary, getCachedData } from '.
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import RefreshButton from '../components/RefreshButton';
+import DataSourceToggle from '../components/DataSourceToggle';
 import StatusBadge from '../components/StatusBadge';
 import { LineChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
@@ -14,6 +15,7 @@ export default function Congestion() {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
   const [deviceFilter, setDeviceFilter] = useState('');
+  const [dataSource, setDataSource] = useState('historical'); // 'historical' | 'live'
 
   const [predictions, setPredictions] = useState(() => getCachedData('/congestion/predictions', { limit: 15, offset: 0 })?.data || []);
   const [summaryData, setSummaryData] = useState(() => getCachedData('/congestion/summary'));
@@ -30,12 +32,13 @@ export default function Congestion() {
       const params = {
         limit: pageSize,
         offset: page * pageSize,
+        source: dataSource,
       };
       if (deviceFilter) params.device_id = deviceFilter;
 
       const [predRes, summaryRes] = await Promise.all([
         getCongestionPredictions(params, { forceRefresh: force }),
-        getCongestionSummary({ forceRefresh: force }).catch(() => null),
+        getCongestionSummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
       ]);
 
       setPredictions(predRes.data || []);
@@ -46,7 +49,7 @@ export default function Congestion() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, deviceFilter, predictions.length]);
+  }, [page, pageSize, deviceFilter, dataSource, predictions.length]);
 
   useEffect(() => {
     fetchCongestionData();
@@ -119,6 +122,14 @@ export default function Congestion() {
         </div>
 
         <div className="header-actions">
+          <DataSourceToggle
+            value={dataSource}
+            onChange={(src) => {
+              setDataSource(src);
+              setPage(0);
+            }}
+          />
+
           <select
             value={deviceFilter}
             onChange={(e) => {

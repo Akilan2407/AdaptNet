@@ -7,12 +7,14 @@ import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
 import { IconTraces, IconClose } from '../components/Icons';
 import RefreshButton from '../components/RefreshButton';
+import DataSourceToggle from '../components/DataSourceToggle';
 import { formatPercent, formatTimestamp, formatMbps } from '../utils/formatters';
 
 export default function Traces() {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
   const [statusFilter, setStatusFilter] = useState('');
+  const [dataSource, setDataSource] = useState('historical'); // 'historical' | 'live'
 
   const [traces, setTraces] = useState(() => getCachedData('/traces', { limit: 15, offset: 0 })?.data || []);
   const [summaryData, setSummaryData] = useState(() => getCachedData('/traces/summary'));
@@ -31,12 +33,13 @@ export default function Traces() {
       const params = {
         limit: pageSize,
         offset: page * pageSize,
+        source: dataSource,
       };
       if (statusFilter) params.status = statusFilter;
 
       const [tracesRes, summaryRes] = await Promise.all([
         getTraces(params, { forceRefresh: force }),
-        getTraceSummary({ forceRefresh: force }).catch(() => null),
+        getTraceSummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
       ]);
 
       setTraces(tracesRes.data || []);
@@ -47,7 +50,7 @@ export default function Traces() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, statusFilter, traces.length]);
+  }, [page, pageSize, statusFilter, dataSource, traces.length]);
 
   useEffect(() => {
     fetchTraces();
@@ -133,6 +136,14 @@ export default function Traces() {
         </div>
 
         <div className="header-actions">
+          <DataSourceToggle
+            value={dataSource}
+            onChange={(src) => {
+              setDataSource(src);
+              setPage(0);
+            }}
+          />
+
           <select
             value={statusFilter}
             onChange={(e) => {

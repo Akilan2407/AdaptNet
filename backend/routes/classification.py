@@ -64,5 +64,23 @@ def get_flows():
 @classification_bp.route("/summary", methods=["GET"])
 def get_summary():
     """Retrieve classification summary, active rules, and live class distribution."""
+    source = request.args.get("source", default="historical", type=str).lower()
+    if source == "live":
+        from ml.realtime.pipeline_manager import pipeline_manager
+        flows, total = pipeline_manager.get_live_flows(limit=500)
+        dist = {}
+        for f in flows:
+            tc = f.get("traffic_class", "OTHER")
+            dist[tc] = dist.get(tc, 0) + 1
+        summary = DataService.get_classification_summary()
+        summary = dict(summary)
+        summary["source"] = "live_packet_capture"
+        summary["summary"] = {
+            "total_classified_flows": total,
+            "traffic_class_distribution": dist,
+            "classes_detected_count": len(dist),
+        }
+        return success_response(summary)
+
     summary = DataService.get_classification_summary()
     return success_response(summary)

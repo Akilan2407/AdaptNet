@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   getMonitoringSummary,
   getCongestionSummary,
@@ -9,6 +9,7 @@ import {
 } from '../services/api';
 import StatCard from '../components/StatCard';
 import RefreshButton from '../components/RefreshButton';
+import DataSourceToggle from '../components/DataSourceToggle';
 import { DonutChart, BarChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
@@ -23,6 +24,7 @@ import {
 import { formatNumber, formatPercent, formatMbps } from '../utils/formatters';
 
 export default function Dashboard() {
+  const [dataSource, setDataSource] = useState('historical'); // 'historical' | 'live'
   const [monitoringSummary, setMonitoringSummary] = useState(() => getCachedData('/monitoring/summary'));
   const [congestionSummary, setCongestionSummary] = useState(() => getCachedData('/congestion/summary'));
   const [policySummary, setPolicySummary] = useState(() => getCachedData('/policy/summary'));
@@ -33,18 +35,18 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(!hasCache);
   const [error, setError] = useState(null);
 
-  const fetchDashboardData = async (force = false) => {
+  const fetchDashboardData = useCallback(async (force = false) => {
     if (!monitoringSummary || force) {
       setLoading(true);
     }
     setError(null);
     try {
       const [monRes, congRes, polRes, ctrlRes, trcRes] = await Promise.all([
-        getMonitoringSummary({ forceRefresh: force }).catch(() => null),
-        getCongestionSummary({ forceRefresh: force }).catch(() => null),
-        getPolicySummary({ forceRefresh: force }).catch(() => null),
+        getMonitoringSummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
+        getCongestionSummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
+        getPolicySummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
         getControlSummary({ forceRefresh: force }).catch(() => null),
-        getTraceSummary({ forceRefresh: force }).catch(() => null),
+        getTraceSummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
       ]);
 
       if (monRes) setMonitoringSummary(monRes);
@@ -57,11 +59,11 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dataSource, monitoringSummary]);
 
   useEffect(() => {
-    fetchDashboardData(false);
-  }, []);
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   if (loading && !monitoringSummary) return <LoadingState message="Loading system dashboard metrics..." />;
   if (error && !monitoringSummary) return <ErrorState message={error} onRetry={() => fetchDashboardData(true)} />;
@@ -89,7 +91,13 @@ export default function Dashboard() {
         <div>
           <h2 className="page-title">Executive Operations Overview</h2>
         </div>
-        <RefreshButton onRefresh={fetchDashboardData} />
+        <div className="header-actions">
+          <DataSourceToggle
+            value={dataSource}
+            onChange={(src) => setDataSource(src)}
+          />
+          <RefreshButton onRefresh={fetchDashboardData} />
+        </div>
       </div>
 
       {/* Primary KPI Metrics Grid */}
