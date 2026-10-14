@@ -131,6 +131,13 @@ class LiveCaptureService:
             else:
                 self._other_count += 1
 
+        # Feed real-time packet into ML processing pipeline
+        try:
+            from ml.realtime.pipeline_manager import pipeline_manager
+            pipeline_manager.enqueue_packet(pkt)
+        except Exception:
+            pass
+
     def _on_sniffer_error(self, err_msg: str) -> None:
         """Handle async errors from background capture threads."""
         with self._lock:
@@ -172,6 +179,13 @@ class LiveCaptureService:
                 self._started_at = time.time()
                 self._stopped_at = None
 
+            # Start real-time ML processing pipeline worker
+            try:
+                from ml.realtime.pipeline_manager import pipeline_manager
+                pipeline_manager.start()
+            except Exception as pe_err:
+                logger.warning("Pipeline manager start warning: %s", pe_err)
+
             return True, f"Capture active via {mode_desc}"
 
         except PermissionError as pe:
@@ -202,6 +216,13 @@ class LiveCaptureService:
             except Exception as e:
                 return False, f"Error stopping sniffer: {str(e)}"
 
+        # Stop real-time ML pipeline worker
+        try:
+            from ml.realtime.pipeline_manager import pipeline_manager
+            pipeline_manager.stop()
+        except Exception:
+            pass
+
         return True, "Capture stopped."
 
     def clear(self) -> None:
@@ -209,6 +230,13 @@ class LiveCaptureService:
         with self._lock:
             self._buffer.clear()
             self._recent_timestamps.clear()
+
+        # Clear ML pipeline buffers
+        try:
+            from ml.realtime.pipeline_manager import pipeline_manager
+            pipeline_manager.clear()
+        except Exception:
+            pass
 
     # ── Metrics & Queries ────────────────────────────────────────────────────
 

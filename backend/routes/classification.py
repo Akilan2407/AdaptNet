@@ -24,6 +24,7 @@ def get_flows():
         sort_by (str): Column to sort by.
         sort_order (str): 'asc' or 'desc'.
     """
+    source = request.args.get("source", default="historical", type=str).lower()
     limit = request.args.get("limit", default=50, type=int)
     offset = request.args.get("offset", default=0, type=int)
     traffic_class = request.args.get("traffic_class", default=None, type=str)
@@ -33,6 +34,19 @@ def get_flows():
 
     if sort_order not in ("asc", "desc"):
         return error_response("sort_order must be 'asc' or 'desc'.", status_code=400)
+
+    # Handle live packet pipeline source
+    if source == "live":
+        from ml.realtime.pipeline_manager import pipeline_manager
+        records, total = pipeline_manager.get_live_flows(
+            limit=limit,
+            offset=offset,
+            device_id=device_id,
+        )
+        if traffic_class:
+            records = [r for r in records if r.get("traffic_class") == traffic_class]
+            total = len(records)
+        return collection_response(records, total=total, limit=limit, offset=offset)
 
     effective_sort = sort_by if sort_by in _VALID_SORT_COLS else None
 

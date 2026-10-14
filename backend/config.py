@@ -1,5 +1,6 @@
 """Configuration settings and data paths for Phase 18 Flask Backend REST API."""
 
+import os
 from pathlib import Path
 import sys
 
@@ -9,8 +10,8 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Server Configuration
-HOST = "0.0.0.0"
-PORT = 5000
+HOST = os.environ.get("HOST", "0.0.0.0")
+PORT = int(os.environ.get("PORT", 5001))
 DEBUG = False
 
 # API Version & Prefix
@@ -19,8 +20,8 @@ API_PREFIX = "/api"
 
 class Config:
     """Flask application configuration class."""
-    API_HOST = "0.0.0.0"
-    API_PORT = 5000
+    API_HOST = os.environ.get("HOST", "0.0.0.0")
+    API_PORT = int(os.environ.get("PORT", 5001))
     API_PREFIX = "/api"
     DEBUG = False
     TESTING = False

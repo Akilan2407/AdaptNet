@@ -22,6 +22,7 @@ def get_predictions():
         sort_by (str): Column to sort by.
         sort_order (str): 'asc' or 'desc'.
     """
+    source = request.args.get("source", default="historical", type=str).lower()
     limit = request.args.get("limit", default=50, type=int)
     offset = request.args.get("offset", default=0, type=int)
     device_id = request.args.get("device_id", default=None, type=str)
@@ -37,6 +38,17 @@ def get_predictions():
             f"congestion_class must be one of: {', '.join(sorted(_VALID_CLASSES))}.",
             status_code=400,
         )
+
+    # Handle live packet pipeline source
+    if source == "live":
+        from ml.realtime.pipeline_manager import pipeline_manager
+        records, total = pipeline_manager.get_live_predictions(
+            limit=limit,
+            offset=offset,
+            device_id=device_id,
+            congestion_class=congestion_class,
+        )
+        return collection_response(records, total=total, limit=limit, offset=offset)
 
     effective_sort = sort_by if sort_by in _VALID_SORT_COLS else None
 

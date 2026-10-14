@@ -211,5 +211,12 @@ export const stopLiveCapture = () => apiClient.post('/live/stop');
 export const clearLivePackets = () => apiClient.post('/live/clear');
 export const getLiveInterfaces = () => apiClient.get('/live/interfaces');
 
+// 12. Real-Time ML Pipeline Endpoints (Trained models on genuine captured traffic)
+export const getLivePipelineStatus = () => apiClient.get('/live/pipeline/status');
+export const getLivePipelineFlows = (params = {}) => apiClient.get('/live/pipeline/flows', { params });
+export const getLivePipelinePredictions = (params = {}) => apiClient.get('/live/pipeline/predictions', { params });
+export const getLivePipelineTraces = (params = {}) => apiClient.get('/live/pipeline/traces', { params });
+export const clearLivePipeline = () => apiClient.post('/live/pipeline/clear');
+
 export default apiClient;
 

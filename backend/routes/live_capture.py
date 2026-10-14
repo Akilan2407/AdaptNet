@@ -108,3 +108,64 @@ def get_interfaces():
     """List available network interfaces for live packet sniffing."""
     ifaces = live_capture_service.get_available_interfaces()
     return success_response({"interfaces": ifaces, "count": len(ifaces)})
+
+
+# ── Real-Time ML Pipeline Endpoints ──────────────────────────────────────────
+
+@live_capture_bp.route("/pipeline/status", methods=["GET"])
+def get_pipeline_status():
+    """Retrieve real-time ML processing pipeline operational status."""
+    from ml.realtime.pipeline_manager import pipeline_manager
+    status = pipeline_manager.get_status()
+    capture_stats = live_capture_service.get_stats()
+    status["capture_active"] = capture_stats.get("is_live", False) or capture_stats.get("status") == "LIVE"
+    status["capture_interface"] = capture_stats.get("interface")
+    return success_response(status)
+
+
+@live_capture_bp.route("/pipeline/flows", methods=["GET"])
+def get_pipeline_flows():
+    """Retrieve recent live aggregated network flows with ML predictions."""
+    from ml.realtime.pipeline_manager import pipeline_manager
+    limit = min(max(request.args.get("limit", default=50, type=int), 1), 200)
+    offset = max(request.args.get("offset", default=0, type=int), 0)
+    device_id = request.args.get("device_id", default=None, type=str)
+
+    flows, total = pipeline_manager.get_live_flows(limit=limit, offset=offset, device_id=device_id)
+    return collection_response(flows, total=total, limit=limit, offset=offset)
+
+
+@live_capture_bp.route("/pipeline/predictions", methods=["GET"])
+def get_pipeline_predictions():
+    """Retrieve latest real-time ML inference predictions across all models."""
+    from ml.realtime.pipeline_manager import pipeline_manager
+    limit = min(max(request.args.get("limit", default=50, type=int), 1), 200)
+    offset = max(request.args.get("offset", default=0, type=int), 0)
+    device_id = request.args.get("device_id", default=None, type=str)
+    c_class = request.args.get("congestion_class", default=None, type=str)
+
+    preds, total = pipeline_manager.get_live_predictions(
+        limit=limit, offset=offset, device_id=device_id, congestion_class=c_class
+    )
+    return collection_response(preds, total=total, limit=limit, offset=offset)
+
+
+@live_capture_bp.route("/pipeline/traces", methods=["GET"])
+def get_pipeline_traces():
+    """Retrieve recent live 7-stage decision traces."""
+    from ml.realtime.pipeline_manager import pipeline_manager
+    limit = min(max(request.args.get("limit", default=50, type=int), 1), 200)
+    offset = max(request.args.get("offset", default=0, type=int), 0)
+    trace_id = request.args.get("trace_id", default=None, type=str)
+
+    traces, total = pipeline_manager.get_live_traces(limit=limit, offset=offset, trace_id=trace_id)
+    return collection_response(traces, total=total, limit=limit, offset=offset)
+
+
+@live_capture_bp.route("/pipeline/clear", methods=["POST"])
+def clear_pipeline():
+    """Clear in-memory real-time ML pipeline buffers."""
+    from ml.realtime.pipeline_manager import pipeline_manager
+    pipeline_manager.clear()
+    return success_response({"message": "Real-time ML pipeline buffers cleared."})
+

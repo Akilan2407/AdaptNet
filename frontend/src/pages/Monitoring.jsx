@@ -12,6 +12,7 @@ export default function Monitoring() {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
   const [deviceFilter, setDeviceFilter] = useState('');
+  const [dataSource, setDataSource] = useState('historical'); // 'historical' | 'live'
 
   const [flows, setFlows] = useState(() => getCachedData('/monitoring/flows', { limit: 15, offset: 0 })?.data || []);
   const [summary, setSummary] = useState(() => getCachedData('/monitoring/summary'));
@@ -28,12 +29,13 @@ export default function Monitoring() {
       const params = {
         limit: pageSize,
         offset: page * pageSize,
+        source: dataSource,
       };
       if (deviceFilter) params.device_id = deviceFilter;
 
       const [flowsRes, summaryRes] = await Promise.all([
         getMonitoringFlows(params, { forceRefresh: force }),
-        getMonitoringSummary({ forceRefresh: force }).catch(() => null),
+        getMonitoringSummary({ ...params }, { forceRefresh: force }).catch(() => null),
       ]);
 
       setFlows(flowsRes.data || []);
@@ -44,7 +46,7 @@ export default function Monitoring() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, deviceFilter, flows.length]);
+  }, [page, pageSize, deviceFilter, dataSource, flows.length]);
 
   useEffect(() => {
     fetchFlows();
@@ -129,6 +131,48 @@ export default function Monitoring() {
         </div>
 
         <div className="header-actions">
+          {/* Data Source Toggle */}
+          <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.05)', borderRadius: '10px', padding: '3px' }}>
+            <button
+              onClick={() => {
+                setDataSource('historical');
+                setPage(0);
+              }}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '8px',
+                border: 'none',
+                background: dataSource === 'historical' ? 'white' : 'transparent',
+                color: dataSource === 'historical' ? '#1c1917' : '#78716c',
+                fontWeight: 600,
+                fontSize: '12px',
+                cursor: 'pointer',
+                boxShadow: dataSource === 'historical' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+              }}
+            >
+              📁 Historical
+            </button>
+            <button
+              onClick={() => {
+                setDataSource('live');
+                setPage(0);
+              }}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '8px',
+                border: 'none',
+                background: dataSource === 'live' ? '#10b981' : 'transparent',
+                color: dataSource === 'live' ? 'white' : '#78716c',
+                fontWeight: 600,
+                fontSize: '12px',
+                cursor: 'pointer',
+                boxShadow: dataSource === 'live' ? '0 1px 3px rgba(16,185,129,0.3)' : 'none',
+              }}
+            >
+              ⚡ Live Wire
+            </button>
+          </div>
+
           {/* Device Filter Dropdown */}
           <select
             value={deviceFilter}
@@ -186,8 +230,11 @@ export default function Monitoring() {
           <DataTable
             columns={columns}
             data={flows}
-            loading={loading}
-            emptyMessage="No network telemetry flows matching criteria."
+            emptyMessage={
+              dataSource === 'live'
+                ? 'No live network telemetry flows captured yet. Go to Live Wire Sniffer to start streaming real-time packets.'
+                : 'No network telemetry flows matching criteria.'
+            }
             rowKey="flow_id"
             pagination={{
               page,

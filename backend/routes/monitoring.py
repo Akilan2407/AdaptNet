@@ -22,7 +22,9 @@ def get_flows():
         device_id (str): Filter by host identifier.
         sort_by (str): Column to sort by (default: timestamp).
         sort_order (str): 'asc' or 'desc' (default: desc).
+        source (str): 'historical' (default) or 'live' for real-time captured traffic.
     """
+    source = request.args.get("source", default="historical", type=str).lower()
     limit = request.args.get("limit", default=50, type=int)
     offset = request.args.get("offset", default=0, type=int)
     device_id = request.args.get("device_id", default=None, type=str)
@@ -32,6 +34,16 @@ def get_flows():
     # Validate sort_order
     if sort_order not in ("asc", "desc"):
         return error_response("sort_order must be 'asc' or 'desc'.", status_code=400)
+
+    # Handle live packet pipeline source
+    if source == "live":
+        from ml.realtime.pipeline_manager import pipeline_manager
+        records, total = pipeline_manager.get_live_flows(
+            limit=limit,
+            offset=offset,
+            device_id=device_id,
+        )
+        return collection_response(records, total=total, limit=limit, offset=offset)
 
     # Validate sort_by column
     effective_sort = sort_by if sort_by in _VALID_SORT_COLS else "timestamp"
@@ -49,6 +61,11 @@ def get_flows():
 @monitoring_bp.route("/summary", methods=["GET"])
 def get_summary():
     """Retrieve enhanced aggregate telemetry metrics and per-device breakdown."""
+    source = request.args.get("source", default="historical", type=str).lower()
+    if source == "live":
+        from ml.realtime.pipeline_manager import pipeline_manager
+        return success_response(pipeline_manager.get_live_summary())
+
     summary = DataService.get_monitoring_summary()
     return success_response(summary)
 
