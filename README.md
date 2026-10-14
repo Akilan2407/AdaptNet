@@ -1,6 +1,6 @@
-# Explainable, User-Aware ML System for Adaptive Network Traffic Management in Small LANs
+# AdaptNet: Explainable, User-Aware ML System for Adaptive Network Traffic Management
 
-An intelligent, explainable network traffic management system combining low-level C telemetry collection, Python-powered machine learning (user profiling, GRU congestion prediction, and SHAP explainability), and a modern web dashboard.
+An end-to-end intelligent network traffic management system combining low-level C telemetry collection, Python-powered machine learning (behavior profiling, GRU congestion forecasting, rule-based QoS policy engines, and SHAP explainability), a Flask REST API service, and a modern React Vite admin dashboard.
 
 ---
 
@@ -8,123 +8,226 @@ An intelligent, explainable network traffic management system combining low-leve
 
 ```
 adaptive-network-traffic-management/
-├── network/                    # Low-level networking & IPC in C
-│   ├── agent/                  # C telemetry monitoring agent
+├── network/                    # Low-level networking & IPC in C / Python
+│   ├── agent/                  # C telemetry monitoring agent (packet dissection, timing)
 │   ├── controller/             # C network controller & telemetry hub
-│   └── common/                 # Common headers (protocol.h, packet definitions)
+│   ├── common/                 # Protocol headers (protocol.h, packet definitions)
+│   └── traffic/                # Synthetic traffic generation & topology emulation
 ├── ml/                         # Machine Learning pipeline
+│   ├── features/               # Feature extraction from raw network flows
 │   ├── profiling/              # User/device clustering (K-Means, DBSCAN)
-│   ├── congestion/             # Congestion prediction (TensorFlow / Keras GRU)
-│   ├── baseline/               # Statistical baselines & rule engines
-│   └── explainability/         # Model transparency & explanations (SHAP)
-├── backend/                    # Flask REST API & service layer
-├── frontend/                   # React + Vite admin dashboard
-├── data/                       # Datasets & synthetic traffic captures
-│   ├── raw/                    # Raw pcap & network flow logs
-│   └── processed/              # Normalized feature tensors
-├── tests/                      # Unit & integration test suites
-│   ├── network/                # C agent/controller tests
-│   ├── ml/                     # ML model validation & inference tests
-│   └── backend/                # Flask endpoint tests
-├── docs/                       # Architecture & design documents
-├── Makefile                    # C build system
+│   ├── classification/         # Rule-based & ML traffic classification
+│   ├── congestion/             # Congestion forecasting (GRU recurrent neural networks)
+│   ├── baseline/               # Statistical baselines & comparative models
+│   ├── policy/                 # QoS policy engine & priority matrix
+│   ├── trace/                  # End-to-end decision trace pipeline
+│   ├── explainability/         # Model transparency & feature attributions (SHAP)
+│   └── explanation/            # Natural language explanation generator
+├── backend/                    # Flask REST API service layer
+│   ├── routes/                 # Blueprint endpoints (health, monitoring, profiling, etc.)
+│   ├── services/               # Data loaders, CSV parsers, and cache managers
+│   ├── tests/                  # REST API test suite (44 automated tests)
+│   └── app.py                  # API entry point & CORS configuration
+├── frontend/                   # Modern React + Vite web dashboard
+│   ├── src/                    # Components, pages, hooks, charts, API client
+│   └── vite.config.js          # Vite configuration with `/api` proxy to port 5001
+├── data/                       # Datasets, pipeline outputs, and telemetry logs
+│   ├── monitoring/             # Network flow records & metrics
+│   ├── features/               # Normalized feature matrices
+│   ├── profiling/              # Clustering outputs & behavior profiles
+│   ├── congestion/             # Congestion predictions & model artifacts
+│   ├── policies/               # Policy allocations & decision matrices
+│   ├── traces/                 # Structured decision trace logs
+│   └── explainability/         # SHAP local/global attributions & summary JSONs
+├── tests/                      # Integration & unit test suites (backend, ml, network)
+├── docs/                       # Architecture diagrams & technical documentation
+├── start_system.ps1            # Windows PowerShell one-click launcher
+├── start_system.sh             # Linux/macOS Bash one-click launcher
+├── COMMANDS.md                 # Full command and operational reference guide
+├── Makefile                    # C build system for monitoring agent & controller
 ├── CMakeLists.txt              # CMake build configuration
-├── requirements.txt            # Python ML & backend dependencies
-└── README.md                   # Project overview & instructions
+├── requirements.txt            # Python dependencies (Flask, scikit-learn, Scapy, etc.)
+└── README.md                   # Project overview & quick start
 ```
 
 ### Technology Matrix
-- **Low-Level Networking & Agent**: `C` (C11, POSIX sockets, pthread)
-- **Agent ↔ Controller IPC**: `TCP` (`protocol.h` fixed-format frames)
-- **Monitored Application Traffic**: `TCP` & `UDP` (bandwidth, RTT, jitter, loss)
-- **ML / Data Processing**: `Python 3`, `NumPy`, `Pandas`, `SciPy`
-- **User / Traffic Profiling**: `scikit-learn` (`K-Means`, `DBSCAN`)
+- **Telemetry Collection & Sniffing**: `C` (C11, POSIX sockets, pthread, pcap) / `Python` (`scapy`, `psutil`)
+- **Agent ↔ Controller IPC**: `TCP` (`protocol.h` fixed-format binary frames)
+- **Data Processing**: `NumPy`, `Pandas`, `SciPy`
+- **User / Device Profiling**: `scikit-learn` (`K-Means`, `DBSCAN`)
 - **Congestion Forecasting**: `TensorFlow` / `Keras` (GRU recurrent neural networks)
-- **ML Explainability (XAI)**: `SHAP` (Shapley Additive exPlanations)
-- **Backend API**: `Flask`, `Flask-CORS`
-- **Frontend Dashboard**: `React`, `Vite`
-- **Testing & Emulation**: `Mininet`, `iperf3`, `pytest`
+- **Explainability (XAI)**: `SHAP` (Shapley Additive exPlanations) & Natural Language Reason Chains
+- **Backend REST API**: `Flask` 3.x, `Flask-CORS` (listening on port `5001`)
+- **Frontend Dashboard**: `React` 18, `Vite`, Tailwind CSS / Lucide icons (listening on port `3000`)
+- **Testing & Emulation**: `pytest`, `Mininet`, `iperf3`
 
 ---
 
-## 🚀 Getting Started & Environment Setup
+## ⚡ Quick Start
 
 ### 1. Prerequisites
-- **C Compiler**: `clang` or `gcc` (with `make`)
-- **Python**: `Python 3.10+`
+- **Python**: `Python 3.10+` (tested with Python 3.13 / 3.14)
 - **Node.js**: `Node v18+` and `npm`
+- **C Compiler** *(Optional for C binaries on Linux/macOS)*: `gcc` or `clang` with `make`
 
-### 2. Build the C Networking System
+### 2. One-Command Launch (Backend + Frontend)
+
+#### Windows (PowerShell)
+```powershell
+.\start_system.ps1
+```
+*Note: If script execution is restricted on Windows, allow execution by running once:*
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+#### Linux / macOS (Bash)
 ```bash
-# Compile both agent and controller skeletons
+chmod +x start_system.sh
+./start_system.sh
+```
+
+The unified launcher checks port availability, starts the Flask REST API on port `5001`, starts the React Vite dashboard on port `3000`, and continuously monitors both processes.
+
+---
+
+## 🌐 Active Service Endpoints
+
+| Service | URL | Purpose |
+| :--- | :--- | :--- |
+| **Frontend Dashboard** | [http://localhost:3000](http://localhost:3000) | Interactive React administrative dashboard |
+| **Backend REST API Root** | [http://localhost:5001/api](http://localhost:5001/api) | API endpoint catalog & service metadata |
+| **System Health Check** | [http://localhost:5001/api/health](http://localhost:5001/api/health) | Subsystem health, uptime, and module readiness |
+
+### Key REST API Catalog
+
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/health` | `GET` | Health status and module availability |
+| `/api/stats` | `GET` | Aggregated system metrics (flow counts, alert levels) |
+| `/api/monitoring/flows` | `GET` | Live and recorded network flow records |
+| `/api/monitoring/summary` | `GET` | Summary statistics of monitored network flows |
+| `/api/monitoring/search` | `GET` | Filtered flow queries by IP, port, or protocol |
+| `/api/profiling/behaviors` | `GET` | Device behavior profiles and cluster assignments |
+| `/api/profiling/clusters` | `GET` | Summary of identified behavioral clusters |
+| `/api/congestion/predictions` | `GET` | GRU congestion forecasts and risk probabilities |
+| `/api/congestion/summary` | `GET` | Aggregate congestion risk indices across devices |
+| `/api/classification/flows` | `GET` | Flow classification (Web, Streaming, Interactive, etc.) |
+| `/api/policy/decisions` | `GET` | QoS bandwidth limits and priority allocations |
+| `/api/policy/summary` | `GET` | QoS policy overview and rule breakdown |
+| `/api/control/actions` | `GET` | Traffic shaping and queue configuration actions |
+| `/api/control/state` | `GET` | Current operational state of traffic controller |
+| `/api/traces` | `GET` | End-to-end decision traces linking telemetry to QoS |
+| `/api/traces/<trace_id>` | `GET` | Detailed audit record for an individual decision trace |
+| `/api/explainability/local` | `GET` | Local SHAP attribution values for specific predictions |
+| `/api/explainability/global`| `GET` | Global SHAP feature importances across all features |
+| `/api/explanations` | `GET` | Natural language explanations for QoS decisions |
+
+---
+
+## 🛠 Manual Installation & Individual Startup
+
+If you prefer to run services in separate terminals for independent debugging:
+
+### A. Python Environment Setup
+```powershell
+# Windows
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+# Linux / macOS
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### B. Frontend Setup
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+### C. Running Services Individually
+
+**Terminal 1 — Flask REST API (Port 5001):**
+```powershell
+# Windows PowerShell
+$env:PORT = "5001"
+python backend/app.py
+
+# Linux / macOS
+PORT=5001 python backend/app.py
+```
+
+**Terminal 2 — React Dashboard (Port 3000):**
+```bash
+cd frontend
+npm run dev
+```
+
+---
+
+## 🧪 Testing & Verification
+
+Ensure dependencies are installed and run the automated test suite:
+
+```bash
+# Run backend REST API test suite (44 tests)
+pytest -v backend/tests/test_api.py
+
+# Run network module unit tests
+pytest -v tests/network/
+
+# Run ML pipeline unit tests
+pytest -v tests/ml/
+```
+
+### C Networking System (Linux / macOS only)
+```bash
+# Compile monitoring agent and controller binaries
 make all
 
 # Run smoke tests
 make test
-
-# Binaries generated:
-# bin/agent
-# bin/controller
 ```
-
-### 3. Setup Python Virtual Environment
-```bash
-# Create virtual environment
-python3 -m venv .venv
-
-# Activate environment
-source .venv/bin/activate
-
-# Install all ML, backend, and testing dependencies
-pip install -r requirements.txt
-```
-
-#### Windows PowerShell
-```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-If PowerShell blocks activation, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
-once, then activate the environment again.
-
-### 4. Setup & Start React Dashboard
-```bash
-cd frontend
-npm install
-npm run dev
-# Dashboard will be available at http://localhost:3000
-```
-
-### 5. Quick Launch (Both Backend & Frontend)
-```bash
-# Start both Flask REST API (port 5001) and React Dashboard (port 3000)
-./start_system.sh
-```
-
-On Windows PowerShell, use the native launcher instead:
-```powershell
-.\start_system.ps1
-```
-
-The Windows launcher starts the backend on port 5001 and the dashboard on port 3000.
-Live packet capture requires Scapy and Npcap. Linux-only traffic shaping through `tc`
-is simulated on Windows; use WSL2 or Linux for actual kernel traffic control.
 
 ---
 
-## 📌 Development Roadmap & Implementation Status
-- [x] **Phase 1: Project & Environment Setup** (Directory structure, C Makefile, Python venv, requirements, React Vite scaffold, architecture docs)
-- [x] **Phase 2: Live Packet Sniffer & OSI Dissection** (Raw sockets, L2 Ethernet, L3 IPv4 checksums, L4 TCP 9 flags & window, UDP, ICMP)
-- [x] **Phase 3: Real Timing & Metric Tracking** (TCP 3-way handshake RTT, RFC 6298 data/ACK deltas, TCP sequence gap packet loss, RFC 2581 Fast Retransmit dup ACKs)
-- [x] **Phase 4: Traffic Generation & Emulation** (Mininet LAN topology, configurable TCP/UDP iperf3 traffic scenarios)
-- [x] **Phase 5: ML Behavioral Profiling & Traffic Classification** (scikit-learn K-Means/DBSCAN user clustering, rule-based port & protocol classifier)
-- [x] **Phase 6: Proactive Congestion Forecasting** (Deep Learning Keras GRU recurrent time-series models, sequence labeling)
-- [x] **Phase 7: QoS Policy Decision Engine** (Dynamic policy matrix, priority clamping, reason chain generation)
-- [x] **Phase 8: Kernel Traffic Control Actuation** (Linux `tc` HTB hierarchical token bucket queuing, rate shaping, priority filters)
-- [x] **Phase 9: Explainability Engine (XAI)** (SHAP feature attribution, natural language explanations, decision trace logs)
-- [x] **Phase 10: Flask REST API Backend** (Comprehensive read-only REST endpoints, CORS, multi-file data caching)
-- [x] **Phase 11: React + Vite Admin Dashboard** (10 interactive pages: Monitoring, Profiling, Congestion, Policies, Control, Traces, Explanations)
-- [x] **Phase 12: End-to-End System Integration & Evaluation** (181 / 181 automated tests passing across network, ML, and backend)
+## 💻 React Admin Dashboard Modules
+
+The React frontend includes an intuitive dark-themed user interface:
+1. **Network Monitoring**: Real-time traffic throughput, packet rates, RTT, jitter, and active connections.
+2. **User & Device Profiling**: Cluster visualization (K-Means/DBSCAN) distinguishing heavy streamers, bulk downloaders, and interactive users.
+3. **Congestion Forecasting**: Recurrent neural network forecasts indicating upcoming queue saturation and bottleneck probabilities.
+4. **Traffic Classification**: Port and flow classification identifying web browsing, DNS, gaming, VoIP, and bulk data transfers.
+5. **QoS Policy Engine**: Dynamic bandwidth allocation, rate limits, and priority tier assignments.
+6. **Traffic Control**: Kernel traffic control (`tc` HTB) queue status, shaping rules, and actuation state.
+7. **Decision Traces**: Comprehensive audit log mapping inputs, predictions, policies, and actions.
+8. **Explainable AI (XAI)**: Interactive SHAP feature importance charts and clear human-readable explanations explaining *why* traffic was throttled or prioritized.
+9. **Diagnostics & Health**: Live backend subsystem latency, data file freshness, and endpoint telemetry.
+
+---
+
+## 🧹 Port Cleanup & Troubleshooting
+
+If port `5001` or `3000` is already in use from a prior session:
+
+### Windows (PowerShell)
+```powershell
+# Free port 5001 (Backend)
+Get-NetTCPConnection -LocalPort 5001 -State Listen -ErrorAction SilentlyContinue |
+    ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+
+# Free port 3000 (Frontend)
+Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue |
+    ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+### Linux / macOS (Bash)
+```bash
+lsof -ti :5001 | xargs kill -9 2>/dev/null || true
+lsof -ti :3000 | xargs kill -9 2>/dev/null || true
+```
+
+For complete command references across all pipeline components, refer to [`COMMANDS.md`](COMMANDS.md).

@@ -2,7 +2,15 @@ $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $venvPython = Join-Path $projectRoot ".venv\Scripts\python.exe"
-$python = if (Test-Path $venvPython) { $venvPython } else { (Get-Command python).Source }
+$python = if (Test-Path $venvPython) {
+    $venvPython
+} elseif (Get-Command python -ErrorAction SilentlyContinue) {
+    (Get-Command python).Source
+} elseif (Get-Command py -ErrorAction SilentlyContinue) {
+    (Get-Command py).Source
+} else {
+    $null
+}
 
 if (-not $python) {
     throw "Python was not found. Install Python 3.10+ and add it to PATH."
@@ -28,8 +36,13 @@ try {
         Write-Host "[*] Starting Flask backend on port $backendPort..."
         $previousPort = $env:PORT
         $env:PORT = "$backendPort"
+        $pythonArguments = if ([IO.Path]::GetFileName($python) -ieq "py.exe") {
+            @("-3", "backend\app.py")
+        } else {
+            @("backend\app.py")
+        }
         $backendProcess = Start-Process -FilePath $python `
-            -ArgumentList "backend\app.py" `
+            -ArgumentList $pythonArguments `
             -WorkingDirectory $projectRoot `
             -PassThru
         if ($null -eq $previousPort) { Remove-Item Env:PORT } else { $env:PORT = $previousPort }
@@ -39,8 +52,9 @@ try {
         Write-Host "[+] Frontend is already running on port $frontendPort"
     } else {
         Write-Host "[*] Starting React frontend on port $frontendPort..."
-        $frontendProcess = Start-Process -FilePath "npm.cmd" `
-            -ArgumentList "run", "dev", "--", "--port", "$frontendPort" `
+        $viteScript = Join-Path $projectRoot "frontend\node_modules\vite\bin\vite.js"
+        $frontendProcess = Start-Process -FilePath "node.exe" `
+            -ArgumentList $viteScript, "--port", "$frontendPort" `
             -WorkingDirectory (Join-Path $projectRoot "frontend") `
             -PassThru
     }
