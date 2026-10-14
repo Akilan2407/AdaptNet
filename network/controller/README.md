@@ -40,12 +40,12 @@ The **C Network Controller** serves as the central operational hub of the LAN. I
 ```
 
 ### Internal Component Design
-* `adaptive_controller.c`: CLI entrypoint for batch decision parsing and control invocation.
-* `control_interface.c / .h`: High-level command dispatcher supporting `APPLY`, `REMOVE`, `UPDATE`, `STATUS`, and `RESET` / `ROLLBACK`.
-* `flow_mapper.c / .h`: 5-tuple parsing from Phase 13 `flow_id` and interface/device resolution.
-* `tc_manager.c / .h`: Linux `tc` HTB qdisc, class, and u32 filter construction with strict input allowlisting to prevent shell injection.
-* `control_logger.c / .h`: Thread-safe CSV auditing logging into `data/control/control_actions.csv` and `data/control/control_state.csv`.
-* `rollback.c / .h`: Tracks active project handles and executes targeted teardown of project-created qdiscs without touching unrelated system networking.
+* `adaptive_controller.py`: CLI entrypoint for batch decision parsing and control invocation.
+* `control_interface.py`: High-level command dispatcher supporting `APPLY`, `REMOVE`, `UPDATE`, `STATUS`, and `RESET` / `ROLLBACK`.
+* `flow_mapper.py`: 5-tuple parsing from Phase 13 `flow_id` and interface/device resolution.
+* `tc_manager.py`: Linux `tc` HTB qdisc, class, and u32 filter construction with strict input allowlisting to prevent shell injection.
+* `control_logger.py`: Thread-safe CSV auditing logging into `data/control/control_actions.csv` and `data/control/control_state.csv`.
+* `rollback.py`: Tracks active project handles and executes targeted teardown of project-created qdiscs without touching unrelated system networking.
 
 ---
 

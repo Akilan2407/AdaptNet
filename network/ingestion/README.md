@@ -48,24 +48,24 @@ Raw Socket Stream (TCP)
 timestamp|device_id|src_ip|dst_ip|src_port|dst_port|protocol|throughput|rtt|packet_loss|active_connections\n
 ```
 
-### Native C `NetworkRecord` Representation
-```c
-typedef struct {
-    char measurement_timestamp[32]; // Originating timestamp from agent
-    char ingestion_timestamp[32];   // Controller ingestion timestamp
-    char device_id[64];             // Host identifier (h1, h2, ...)
-    char src_ip[16];                // Dotted IPv4
-    char dst_ip[16];                // Dotted IPv4
-    int src_port;                   // 1 to 65535
-    int dst_port;                   // 1 to 65535
-    char protocol[8];               // "TCP" or "UDP"
-    double throughput_mbps;         // Megabits per second
-    int has_rtt;                    // 1 if measured, 0 if N/A
-    double rtt_ms;                  // Latency in ms
-    int has_packet_loss;            // 1 if measured, 0 if N/A
-    double packet_loss_pct;         // Loss percentage (0-100)
-    int active_connections;         // Concurrent active socket count
-} NetworkRecord;
+### Python `NetworkRecord` Representation
+```python
+@dataclass
+class NetworkRecord:
+    measurement_timestamp: str  # Originating timestamp from agent
+    ingestion_timestamp: str    # Controller ingestion timestamp
+    device_id: str              # Host identifier (h1, h2, ...)
+    src_ip: str                 # Dotted IPv4
+    dst_ip: str                 # Dotted IPv4
+    src_port: int               # 1 to 65535
+    dst_port: int               # 1 to 65535
+    protocol: str               # "TCP" or "UDP"
+    throughput_mbps: float      # Megabits per second
+    has_rtt: bool               # True if measured, False if N/A
+    rtt_ms: Optional[float]     # Latency in ms
+    has_packet_loss: bool       # True if measured, False if N/A
+    packet_loss_pct: Optional[float]  # Loss percentage (0-100)
+    active_connections: int     # Concurrent active socket count
 ```
 
 ---

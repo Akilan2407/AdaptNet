@@ -27,6 +27,7 @@ from backend.routes.control import control_bp
 from backend.routes.traces import traces_bp
 from backend.routes.explainability import explainability_bp
 from backend.routes.explanations import explanations_bp
+from backend.routes.stats import stats_bp
 
 
 def create_app(config_class=Config) -> Flask:
@@ -50,6 +51,7 @@ def create_app(config_class=Config) -> Flask:
     app.register_blueprint(traces_bp, url_prefix=f"{prefix}/traces")
     app.register_blueprint(explainability_bp, url_prefix=f"{prefix}/explainability")
     app.register_blueprint(explanations_bp, url_prefix=f"{prefix}/explanations")
+    app.register_blueprint(stats_bp, url_prefix=prefix)
 
     @app.route("/", methods=["GET"])
     @app.route(prefix, methods=["GET"])
@@ -57,13 +59,15 @@ def create_app(config_class=Config) -> Flask:
         """Root API metadata and endpoint directory."""
         return success_response({
             "service": "Adaptive Network Traffic Management REST API",
-            "version": "1.0.0",
-            "phase": "Phase 18 - Backend REST API Module",
+            "version": "1.1.0",
+            "phase": "Phase 18 - Backend REST API Module (Improved)",
             "documentation": f"{prefix}/health",
             "endpoints": [
                 f"{prefix}/health",
+                f"{prefix}/stats",
                 f"{prefix}/monitoring/flows",
                 f"{prefix}/monitoring/summary",
+                f"{prefix}/monitoring/search",
                 f"{prefix}/profiling/behaviors",
                 f"{prefix}/profiling/clusters",
                 f"{prefix}/congestion/predictions",
