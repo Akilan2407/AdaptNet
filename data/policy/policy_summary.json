@@ -1,21 +1,30 @@
 {
-  "total_decisions": 53,
+  "total_decisions": 3000,
   "priority_distribution": {
-    "LOW": 53
+    "LOW": 1488,
+    "HIGH": 622,
+    "MEDIUM": 600,
+    "NORMAL": 290
   },
   "traffic_class_distribution": {
-    "BULK_TRANSFER": 53
+    "BULK_TRANSFER": 1488,
+    "REAL_TIME": 622,
+    "WEB": 600,
+    "OTHER": 290
   },
   "congestion_distribution": {
-    "UNKNOWN": 48,
-    "MEDIUM": 5
+    "UNKNOWN": 2556,
+    "LOW": 433,
+    "MEDIUM": 11
   },
   "rule_usage": {
-    "POLICY_UNKNOWN_CONGESTION_FALLBACK": 48,
-    "POLICY_BULK_MED_CONGESTION": 5
+    "POLICY_UNKNOWN_CONGESTION_FALLBACK": 2556,
+    "POLICY_LOW_CONGESTION_BASE": 433,
+    "POLICY_BULK_MED_CONGESTION": 9,
+    "POLICY_RT_MED_CONGESTION": 2
   },
   "input_completeness": {
-    "PARTIAL": 48,
-    "COMPLETE": 5
+    "PARTIAL": 2556,
+    "COMPLETE": 444
   }
 }

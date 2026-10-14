@@ -1,24 +1,24 @@
 {
-  "timestamp": "2026-09-23T06:46:08.274681+00:00",
+  "timestamp": "2026-10-10T11:51:55.118218+00:00",
   "phase": 10,
   "model_name": "gru_congestion_predictor",
-  "test_sample_count": 3,
+  "test_sample_count": 449,
   "regression_metrics": {
-    "mae": 0.3594,
-    "mse": 0.1292,
-    "rmse": 0.3594,
-    "r2": 0.0,
-    "max_error": 0.3644
+    "mae": 0.0196,
+    "mse": 0.0007,
+    "rmse": 0.026,
+    "r2": 0.8492,
+    "max_error": 0.0998
   },
   "classification_metrics": {
-    "accuracy": 0.0,
-    "precision_macro": 0.0,
-    "recall_macro": 0.0,
-    "f1_macro": 0.0,
+    "accuracy": 0.9755,
+    "precision_macro": 0.3333,
+    "recall_macro": 0.3252,
+    "f1_macro": 0.3292,
     "confusion_matrix": [
       [
-        0,
-        3,
+        438,
+        11,
         0
       ],
       [
@@ -39,17 +39,17 @@
     ]
   },
   "comparison_vs_persistence": {
-    "gru_mae": 0.3594,
-    "persistence_mae": 0.0,
-    "mae_delta": 0.3594,
-    "gru_mse": 0.1292,
-    "persistence_mse": 0.0,
+    "gru_mae": 0.0196,
+    "persistence_mae": 0.0173,
+    "mae_delta": 0.0023,
+    "gru_mse": 0.0007,
+    "persistence_mse": 0.0005,
     "gru_better_than_persistence": false
   },
   "comparison_vs_mean_baseline": {
-    "gru_mae": 0.3594,
-    "mean_mae": 0.0,
-    "mae_delta": 0.3594,
-    "gru_better_than_mean": false
+    "gru_mae": 0.0196,
+    "mean_mae": 0.0856,
+    "mae_delta": -0.066,
+    "gru_better_than_mean": true
   }
 }

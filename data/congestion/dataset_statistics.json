@@ -1,11 +1,11 @@
 {
-  "total_records": 53,
-  "valid_records": 53,
+  "total_records": 3000,
+  "valid_records": 3000,
   "removed_records": 0,
-  "sequence_count": 13,
-  "training_samples": 9,
-  "validation_samples": 1,
-  "test_samples": 3,
+  "sequence_count": 2985,
+  "training_samples": 2089,
+  "validation_samples": 447,
+  "test_samples": 449,
   "feature_count": 21,
   "features": [
     "cluster_id",
@@ -37,14 +37,14 @@
       "strategy": "complete (no nulls)"
     },
     "rtt_ms": {
-      "null_count": 53,
-      "null_percentage": 100.0,
-      "strategy": "100% missing, imputed baseline 0.0"
+      "null_count": 622,
+      "null_percentage": 20.73,
+      "strategy": "imputed median 15.0000"
     },
     "packet_loss_percent": {
-      "null_count": 53,
-      "null_percentage": 100.0,
-      "strategy": "100% missing, imputed baseline 0.0"
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "strategy": "complete (no nulls)"
     },
     "active_connections": {
       "null_count": 0,
@@ -83,20 +83,20 @@
     }
   },
   "class_distribution": {
-    "LOW": 13,
-    "MEDIUM": 0,
-    "HIGH": 0
+    "LOW": 2491,
+    "MEDIUM": 338,
+    "HIGH": 156
   },
   "time_range": {
-    "start": "2026-09-12 15:24:45",
-    "end": "2026-09-12 16:01:29"
+    "start": "2026-09-12 16:00:00",
+    "end": "2026-09-12 16:19:58"
   },
   "sampling_interval": {
-    "median_interval_seconds": 29.5,
-    "min_interval_seconds": 1.0,
-    "max_interval_seconds": 1628.0,
-    "is_regular": false
+    "median_interval_seconds": 2.0,
+    "min_interval_seconds": 2.0,
+    "max_interval_seconds": 2.0,
+    "is_regular": true
   },
   "history_window": 30,
-  "prediction_horizon": 30
+  "prediction_horizon": 10
 }

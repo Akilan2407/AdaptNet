@@ -1,29 +1,31 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getExplanations, getExplanationById, getExplanationSummary } from '../services/api';
+import { getExplanations, getExplanationById, getExplanationSummary, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconExplanations, IconRefresh, IconClose } from '../components/Icons';
+import { IconExplanations, IconClose } from '../components/Icons';
+import RefreshButton from '../components/RefreshButton';
 import { formatPercent, formatTimestamp } from '../utils/formatters';
 
 export default function Explanations() {
-  const [explanations, setExplanations] = useState([]);
-  const [summaryData, setSummaryData] = useState(null);
-  const [selectedExp, setSelectedExp] = useState(null);
-  const [expLoading, setExpLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pagination & Filtering
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
 
-  const fetchExplanations = useCallback(async () => {
-    setLoading(true);
+  const [explanations, setExplanations] = useState(() => getCachedData('/explanations', { limit: 15, offset: 0 })?.data || []);
+  const [summaryData, setSummaryData] = useState(() => getCachedData('/explanations/summary'));
+  const [totalRecords, setTotalRecords] = useState(() => getCachedData('/explanations', { limit: 15, offset: 0 })?.total || 0);
+  const [selectedExp, setSelectedExp] = useState(null);
+  const [expLoading, setExpLoading] = useState(false);
+  const [loading, setLoading] = useState(() => !explanations.length && !summaryData);
+  const [error, setError] = useState(null);
+
+  const fetchExplanations = useCallback(async (force = false) => {
+    if (!explanations.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const params = {
@@ -33,8 +35,8 @@ export default function Explanations() {
       if (statusFilter) params.status = statusFilter;
 
       const [expRes, summaryRes] = await Promise.all([
-        getExplanations(params),
-        getExplanationSummary().catch(() => null),
+        getExplanations(params, { forceRefresh: force }),
+        getExplanationSummary({ forceRefresh: force }).catch(() => null),
       ]);
 
       setExplanations(expRes.data || []);
@@ -45,7 +47,7 @@ export default function Explanations() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, statusFilter]);
+  }, [page, pageSize, statusFilter, explanations.length]);
 
   useEffect(() => {
     fetchExplanations();
@@ -124,9 +126,6 @@ export default function Explanations() {
       <div className="page-header">
         <div>
           <h2 className="page-title">Natural-Language Decision Explanations</h2>
-          <p className="page-desc">
-            Auditable, human-readable explanations translating telemetry, SHAP attributions, and QoS decisions.
-          </p>
         </div>
 
         <div className="header-actions">
@@ -143,10 +142,7 @@ export default function Explanations() {
             <option value="PARTIAL">PARTIAL</option>
           </select>
 
-          <button onClick={fetchExplanations} className="btn btn-secondary">
-            <IconRefresh size={14} />
-            <span>Refresh</span>
-          </button>
+          <RefreshButton onRefresh={fetchExplanations} />
         </div>
       </div>
 
@@ -156,7 +152,7 @@ export default function Explanations() {
           title="Generated Explanations"
           value={summary.total_traces || totalRecords}
           icon={IconExplanations}
-          accent="cyan"
+          accent="amber"
         />
         <StatCard
           title="Full Explanations"
@@ -181,7 +177,7 @@ export default function Explanations() {
         />
       </div>
 
-      <div className="traces-layout-split">
+      <div className={`traces-layout-split ${selectedExp ? 'has-detail' : ''}`}>
         {/* Explanations List */}
         <div className="content-card traces-table-card">
           <h3 className="card-heading">Explanation Records Registry</h3>

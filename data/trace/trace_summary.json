@@ -1,16 +1,16 @@
 {
-  "total_traces": 53,
-  "complete_traces": 5,
-  "partial_traces": 48,
+  "total_traces": 3000,
+  "complete_traces": 444,
+  "partial_traces": 2556,
   "incomplete_traces": 0,
   "monitoring_match_rate": 100.0,
   "feature_match_rate": 100.0,
   "profile_match_rate": 100.0,
-  "congestion_match_rate": 11.32,
+  "congestion_match_rate": 14.97,
   "classification_match_rate": 100.0,
   "policy_match_rate": 100.0,
   "control_match_rate": 100.0,
-  "exact_match_count": 53,
+  "exact_match_count": 3000,
   "timestamp_tolerance_match_count": 0,
   "unmatched_count": 0
 }

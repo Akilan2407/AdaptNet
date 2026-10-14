@@ -13,6 +13,6 @@
     "active_hours_count"
   ],
   "algorithm": "KMeans",
-  "n_clusters": 2,
+  "n_clusters": 3,
   "random_state": 42
 }

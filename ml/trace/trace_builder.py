@@ -134,6 +134,20 @@ class TraceBuilder:
         sorted_policy_df = policy_df.sort_values(by=sort_cols).reset_index(drop=True)
 
         monitoring_df = dfs.get("monitoring", pd.DataFrame())
+        if not monitoring_df.empty and "flow_id" not in monitoring_df.columns:
+            monitoring_df["flow_id"] = (
+                monitoring_df["device_id"].astype(str)
+                + "_"
+                + monitoring_df["src_ip"].astype(str)
+                + ":"
+                + monitoring_df["src_port"].astype(str)
+                + "->"
+                + monitoring_df["dst_ip"].astype(str)
+                + ":"
+                + monitoring_df["dst_port"].astype(str)
+                + "_"
+                + monitoring_df["protocol"].astype(str).str.upper()
+            )
         features_df = dfs.get("features", pd.DataFrame())
         profiles_df = dfs.get("profiles", pd.DataFrame())
         congestion_df = dfs.get("congestion", pd.DataFrame())
@@ -261,7 +275,7 @@ class TraceBuilder:
                 control_action=ctrl_action,
                 control_class=ctrl_target,
                 control_status=ctrl_status,
-                throughput_mbps=float(feat_record.get("throughput_mbps", mon_record.get("throughput", 0.0) if mon_record else 0.0)),
+                throughput_mbps=float((feat_record or {}).get("throughput_mbps", (mon_record or {}).get("throughput", 0.0))),
                 cluster_id=cluster_id,
             )
 

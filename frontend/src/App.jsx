@@ -1,7 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+import {
+  getMonitoringSummary,
+  getCongestionSummary,
+  getPolicySummary,
+  getControlSummary,
+  getTraceSummary,
+  getClassificationSummary,
+  getProfilingClusters,
+  getExplainabilitySummary,
+  getExplanationSummary,
+} from './services/api';
 
 // View Pages
 import Dashboard from './pages/Dashboard';
@@ -16,9 +27,38 @@ import Explainability from './pages/Explainability';
 import Explanations from './pages/Explanations';
 
 export default function App() {
+  useEffect(() => {
+    // Pre-warm API summaries in background on idle so all tab navigations are 0ms instant
+    const prewarm = () => {
+      getMonitoringSummary().catch(() => {});
+      getCongestionSummary().catch(() => {});
+      getPolicySummary().catch(() => {});
+      getControlSummary().catch(() => {});
+      getTraceSummary().catch(() => {});
+      getClassificationSummary().catch(() => {});
+      getProfilingClusters().catch(() => {});
+      getExplainabilitySummary().catch(() => {});
+      getExplanationSummary().catch(() => {});
+    };
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(prewarm, { timeout: 1000 });
+    } else {
+      setTimeout(prewarm, 200);
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="app-layout">
+        {/* Ambient Warm Champagne & Sunset Mesh Canvas */}
+        <div className="sunset-canvas" aria-hidden="true">
+          <div className="sunset-blob sunset-amber"></div>
+          <div className="sunset-blob sunset-coral"></div>
+          <div className="sunset-blob sunset-rose"></div>
+          <div className="sunset-blob sunset-amethyst"></div>
+          <div className="sunset-blob sunset-sage"></div>
+        </div>
         <Navbar />
         <div className="layout-body">
           <Sidebar />

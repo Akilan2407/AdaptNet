@@ -24,16 +24,23 @@ def client():
 
 # 1. Health & Root Endpoints
 def test_health_check(client):
-    """Test GET /api/health."""
+    """Test GET /api/health with dynamic module readiness."""
     response = client.get("/api/health")
     assert response.status_code == 200
     data = response.get_json()
-    assert data["status"] == "healthy"
+    assert data["status"] in ("healthy", "degraded", "unhealthy")
     assert data["service"] == "network-management-api"
     assert data["version"] == "1.0.0"
     assert "modules" in data
-    assert data["modules"]["monitoring"] == "ready"
-    assert data["modules"]["explanations"] == "ready"
+    assert "uptime_seconds" in data
+    assert "timestamp" in data
+    # Each module now returns a dict with status + missing_files
+    for module_name, module_info in data["modules"].items():
+        assert "status" in module_info
+        assert module_info["status"] in ("ready", "degraded", "unavailable")
+        assert "missing_files" in module_info
+    assert data["modules"]["monitoring"]["status"] == "ready"
+    assert data["modules"]["explanations"]["status"] == "ready"
 
 
 def test_root_index(client):
@@ -362,3 +369,143 @@ def test_cors_headers(client):
     response = client.get("/api/health", headers={"Origin": "http://localhost:3000"})
     assert response.status_code == 200
     assert response.headers.get("Access-Control-Allow-Origin") in ("*", "http://localhost:3000")
+
+
+# 13. Aggregate Stats Endpoint
+def test_aggregate_stats(client):
+    """Test GET /api/stats returns consolidated dashboard KPIs."""
+    response = client.get("/api/stats")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    assert "monitoring" in data
+    assert "congestion" in data
+    assert "policy" in data
+    assert "control" in data
+    assert "traces" in data
+    assert "explainability" in data
+    assert "total_records" in data["monitoring"]
+    assert "unique_devices" in data["monitoring"]
+    assert "control_success_rate" in data["control"]
+
+
+# 14. Monitoring Search Endpoint
+def test_monitoring_search_valid(client):
+    """Test GET /api/monitoring/search returns matching flow records."""
+    response = client.get("/api/monitoring/search?q=h1")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    assert "data" in data
+
+
+def test_monitoring_search_too_short(client):
+    """Short query (< 2 chars) should return 400."""
+    short_resp = client.get("/api/monitoring/search?q=h")
+    assert short_resp.status_code == 400
+    assert short_resp.get_json()["status"] == "error"
+
+
+# 15. Sort Parameter Support
+def test_monitoring_flows_sort_valid(client):
+    """Test sort_by and sort_order on monitoring/flows."""
+    response = client.get("/api/monitoring/flows?sort_by=throughput_mbps&sort_order=asc&limit=5")
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "success"
+
+
+def test_monitoring_flows_sort_invalid(client):
+    """Bad sort_order should return 400."""
+    bad = client.get("/api/monitoring/flows?sort_order=invalid")
+    assert bad.status_code == 400
+    assert bad.get_json()["status"] == "error"
+
+
+# 16. Policy rule_id Filter
+def test_policy_rule_id_filter(client):
+    """Test filtering policy decisions by rule_id."""
+    response = client.get("/api/policy/decisions?rule_id=POLICY_UNKNOWN_CONGESTION_FALLBACK")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    for decision in data["data"]:
+        assert decision["policy_rule_id"] == "POLICY_UNKNOWN_CONGESTION_FALLBACK"
+
+
+# 17. Congestion Class Filter
+def test_congestion_class_filter_valid(client):
+    """Valid congestion_class filter works."""
+    response = client.get("/api/congestion/predictions?congestion_class=MEDIUM")
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "success"
+
+
+def test_congestion_class_filter_invalid(client):
+    """Invalid congestion_class should return 400."""
+    bad = client.get("/api/congestion/predictions?congestion_class=INVALID")
+    assert bad.status_code == 400
+    assert bad.get_json()["status"] == "error"
+
+
+# 18. SHAP Status Filter
+def test_explainability_local_status_filter_valid(client):
+    """Filtering SHAP local by valid status works."""
+    response = client.get("/api/explainability/local?status=SKIPPED&limit=5")
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "success"
+
+
+def test_explainability_local_status_filter_invalid(client):
+    """Invalid SHAP status should return 400."""
+    bad = client.get("/api/explainability/local?status=BOGUS")
+    assert bad.status_code == 400
+    assert bad.get_json()["status"] == "error"
+
+
+# 19. Control State Pagination
+def test_control_state_pagination(client):
+    """Test limit/offset on control/state (previously ignored pagination)."""
+    response = client.get("/api/control/state?limit=2&offset=0")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    assert data["count"] <= 2
+
+
+# 20. Profiling Device Filter
+def test_profiling_behaviors_device_filter(client):
+    """Test filtering profiling behaviors by device_id."""
+    response = client.get("/api/profiling/behaviors?device_id=h1")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    for profile in data["data"]:
+        assert profile["device_id"] == "h1"
+
+
+# 21. Enriched Monitoring Summary
+def test_monitoring_summary_enriched(client):
+    """Monitoring summary now includes per_device, protocol_distribution, time_range."""
+    response = client.get("/api/monitoring/summary")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "success"
+    assert "per_device" in data
+    assert "protocol_distribution" in data
+    assert "time_range" in data
+
+
+# 22. Trace Status Validation
+def test_traces_status_validation(client):
+    """Invalid status on traces returns 400."""
+    bad = client.get("/api/traces?status=INVALID_STATUS")
+    assert bad.status_code == 400
+    assert bad.get_json()["status"] == "error"
+
+
+# 23. Control Actions Status Validation
+def test_control_actions_status_validation(client):
+    """Invalid status on control/actions returns 400."""
+    bad = client.get("/api/control/actions?status=UNKNOWN_STATUS")
+    assert bad.status_code == 400
+    assert bad.get_json()["status"] == "error"

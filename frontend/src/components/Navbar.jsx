@@ -30,12 +30,16 @@ export default function Navbar({ onRefreshAll = null }) {
   return (
     <header className="top-navbar">
       <div className="navbar-brand">
-        <div className="brand-logo-badge">LAN-QoS</div>
+        <div className="brand-icon-glow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
         <div className="brand-titles">
           <h1 className="brand-main-title">Adaptive Network Traffic Management</h1>
-          <span className="brand-subtitle">
-            Explainable, User-Aware ML System for Small LANs • Phase 19 Dashboard
-          </span>
         </div>
       </div>
 
@@ -55,12 +59,11 @@ export default function Navbar({ onRefreshAll = null }) {
               : 'Flask API backend is unreachable on port 5000'
           }
         >
-          <span className="pulsing-indicator"></span>
           <span className="connection-text">
             {healthStatus === 'connected'
-              ? '● Backend Connected'
+              ? 'Backend Connected'
               : healthStatus === 'offline'
-              ? '● Backend Offline'
+              ? 'Backend Offline'
               : 'Checking API...'}
           </span>
         </div>

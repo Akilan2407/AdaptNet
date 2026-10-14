@@ -1,26 +1,28 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getMonitoringFlows, getMonitoringSummary } from '../services/api';
+import { getMonitoringFlows, getMonitoringSummary, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconMonitoring, IconRefresh } from '../components/Icons';
+import { IconMonitoring } from '../components/Icons';
 import { formatMbps, formatPercent, formatTimestamp } from '../utils/formatters';
 
 export default function Monitoring() {
-  const [flows, setFlows] = useState([]);
-  const [summary, setSummary] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pagination & Filtering
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [deviceFilter, setDeviceFilter] = useState('');
 
-  const fetchFlows = useCallback(async () => {
-    setLoading(true);
+  const [flows, setFlows] = useState(() => getCachedData('/monitoring/flows', { limit: 15, offset: 0 })?.data || []);
+  const [summary, setSummary] = useState(() => getCachedData('/monitoring/summary'));
+  const [totalRecords, setTotalRecords] = useState(() => getCachedData('/monitoring/flows', { limit: 15, offset: 0 })?.total || 0);
+  const [loading, setLoading] = useState(() => !flows.length && !summary);
+  const [error, setError] = useState(null);
+
+  const fetchFlows = useCallback(async (force = false) => {
+    if (!flows.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const params = {
@@ -30,8 +32,8 @@ export default function Monitoring() {
       if (deviceFilter) params.device_id = deviceFilter;
 
       const [flowsRes, summaryRes] = await Promise.all([
-        getMonitoringFlows(params),
-        getMonitoringSummary().catch(() => null),
+        getMonitoringFlows(params, { forceRefresh: force }),
+        getMonitoringSummary({ forceRefresh: force }).catch(() => null),
       ]);
 
       setFlows(flowsRes.data || []);
@@ -42,7 +44,7 @@ export default function Monitoring() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, deviceFilter]);
+  }, [page, pageSize, deviceFilter, flows.length]);
 
   useEffect(() => {
     fetchFlows();
@@ -124,9 +126,6 @@ export default function Monitoring() {
       <div className="page-header">
         <div>
           <h2 className="page-title">Network Telemetry & Flow Monitoring</h2>
-          <p className="page-desc">
-            Raw flow statistics captured by C monitoring agents deployed on endpoints.
-          </p>
         </div>
 
         <div className="header-actions">
@@ -147,10 +146,7 @@ export default function Monitoring() {
             <option value="h5">Host h5</option>
           </select>
 
-          <button onClick={fetchFlows} className="btn btn-secondary">
-            <IconRefresh size={14} />
-            <span>Refresh</span>
-          </button>
+          <RefreshButton onRefresh={fetchFlows} />
         </div>
       </div>
 
@@ -160,14 +156,14 @@ export default function Monitoring() {
           title="Total Telemetry Records"
           value={summary?.total_records || totalRecords}
           icon={IconMonitoring}
-          accent="cyan"
+          accent="amber"
         />
         <StatCard
           title="Active Devices"
           value={summary?.unique_devices || 5}
           unit="hosts"
           icon={IconMonitoring}
-          accent="blue"
+          accent="coral"
         />
         <StatCard
           title="Average Bandwidth"

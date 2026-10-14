@@ -10,6 +10,7 @@ from backend.routes.control import control_bp
 from backend.routes.traces import traces_bp
 from backend.routes.explainability import explainability_bp
 from backend.routes.explanations import explanations_bp
+from backend.routes.stats import stats_bp
 
 ALL_BLUEPRINTS = [
     health_bp,
@@ -22,6 +23,7 @@ ALL_BLUEPRINTS = [
     traces_bp,
     explainability_bp,
     explanations_bp,
+    stats_bp,
 ]
 
 __all__ = [
@@ -35,5 +37,6 @@ __all__ = [
     "traces_bp",
     "explainability_bp",
     "explanations_bp",
+    "stats_bp",
     "ALL_BLUEPRINTS",
 ]

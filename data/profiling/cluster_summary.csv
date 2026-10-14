@@ -1,3 +1,4 @@
 cluster_id,device_count,devices,mean_throughput_mbps,mean_rtt_ms,mean_packet_loss_percent,mean_active_connections,mean_flow_count,mean_tcp_flow_ratio,mean_udp_flow_ratio,mean_active_hours_count,profile_label,description
-0,4,"h2, h3, h4, h5",0.0,0.0,0.0,0.0,7.75,1.0,0.0,2.0,Low-Activity,"Cluster 0 (4 devices): Mean Throughput: 0.00 Mbps, Mean Flow Count: 7.8, TCP Ratio: 1.00, Mean RTT: 0.00 ms."
-1,1,h1,0.0,0.0,0.0,0.0,22.0,1.0,0.0,2.0,High-Flow-Activity,"Cluster 1 (1 device): Mean Throughput: 0.00 Mbps, Mean Flow Count: 22.0, TCP Ratio: 1.00, Mean RTT: 0.00 ms."
+0,2,"h1, h5",43.6351,34.6726,2.1583,10.8867,600.0,0.8175,0.1825,1.0,High-Throughput,"Cluster 0 (2 devices): Mean Throughput: 43.64 Mbps, Mean Flow Count: 600.0, TCP Ratio: 1.00, Mean RTT: 34.67 ms."
+1,2,"h2, h4",15.4251,14.452,0.4433,6.2775,600.0,1.0,0.0,1.0,Baseline-Activity (C1),"Cluster 1 (2 devices): Mean Throughput: 15.43 Mbps, Mean Flow Count: 600.0, TCP Ratio: 1.00, Mean RTT: 14.45 ms."
+2,1,h3,27.2976,19.2734,1.2721,5.4917,600.0,0.3283,0.6717,1.0,Baseline-Activity (C2),"Cluster 2 (1 device): Mean Throughput: 27.30 Mbps, Mean Flow Count: 600.0, TCP Ratio: 1.00, Mean RTT: 19.27 ms."

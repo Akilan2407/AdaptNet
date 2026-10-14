@@ -1,42 +1,48 @@
 {
-  "total_traces": 53,
-  "successful_explanations": 3,
-  "partial_explanations": 50,
+  "total_traces": 3000,
+  "successful_explanations": 444,
+  "partial_explanations": 2556,
   "skipped_explanations": 0,
   "failed_explanations": 0,
-  "prediction_explanation_coverage": 11.32,
+  "prediction_explanation_coverage": 14.97,
   "policy_explanation_coverage": 100.0,
-  "control_explanation_coverage": 5.66,
+  "control_explanation_coverage": 14.8,
   "top_features": [
     {
-      "feature_name": "cluster_id",
-      "mean_absolute_shap": 0.006906
+      "feature_name": "packet_loss_percent",
+      "mean_absolute_shap": 0.035072
     },
     {
-      "feature_name": "total_flow_count",
-      "mean_absolute_shap": 0.005214
+      "feature_name": "active_connections",
+      "mean_absolute_shap": 0.020004
     },
     {
       "feature_name": "throughput_mbps",
-      "mean_absolute_shap": 0.0
+      "mean_absolute_shap": 0.016296
+    },
+    {
+      "feature_name": "rtt_std",
+      "mean_absolute_shap": 0.010065
     },
     {
       "feature_name": "rtt_ms",
-      "mean_absolute_shap": 0.0
-    },
-    {
-      "feature_name": "packet_loss_percent",
-      "mean_absolute_shap": 0.0
+      "mean_absolute_shap": 0.008241
     }
   ],
   "traffic_class_distribution": {
-    "BULK_TRANSFER": 53
+    "BULK_TRANSFER": 1488,
+    "REAL_TIME": 622,
+    "WEB": 600,
+    "OTHER": 290
   },
   "priority_distribution": {
-    "LOW": 53
+    "LOW": 1488,
+    "HIGH": 622,
+    "MEDIUM": 600,
+    "NORMAL": 290
   },
   "control_status_distribution": {
-    "SKIPPED": 50,
-    "DRY_RUN": 3
+    "SKIPPED": 2556,
+    "DRY_RUN": 444
   }
 }

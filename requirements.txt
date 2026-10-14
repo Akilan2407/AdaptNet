@@ -3,6 +3,12 @@ Flask>=3.0.0
 flask-cors>=4.0.0
 requests>=2.31.0
 
+# Networking — Packet Capture & Analysis
+# scapy: cross-platform raw packet capture, dissection (fallback when AF_PACKET unavailable)
+scapy>=2.5.0
+# psutil: cross-platform network interface counter access (macOS, Linux, Windows)
+psutil>=5.9.0
+
 # Scientific & Data Processing
 numpy>=1.26.0
 pandas>=2.1.0

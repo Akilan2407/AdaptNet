@@ -1,29 +1,31 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getTraces, getTraceById, getTraceSummary } from '../services/api';
+import { getTraces, getTraceById, getTraceSummary, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconTraces, IconRefresh, IconClose, IconChevronRight } from '../components/Icons';
+import { IconTraces, IconClose } from '../components/Icons';
+import RefreshButton from '../components/RefreshButton';
 import { formatPercent, formatTimestamp, formatMbps } from '../utils/formatters';
 
 export default function Traces() {
-  const [traces, setTraces] = useState([]);
-  const [summaryData, setSummaryData] = useState(null);
-  const [selectedTrace, setSelectedTrace] = useState(null);
-  const [traceLoading, setTraceLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pagination & Filtering
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
 
-  const fetchTraces = useCallback(async () => {
-    setLoading(true);
+  const [traces, setTraces] = useState(() => getCachedData('/traces', { limit: 15, offset: 0 })?.data || []);
+  const [summaryData, setSummaryData] = useState(() => getCachedData('/traces/summary'));
+  const [totalRecords, setTotalRecords] = useState(() => getCachedData('/traces', { limit: 15, offset: 0 })?.total || 0);
+  const [selectedTrace, setSelectedTrace] = useState(null);
+  const [traceLoading, setTraceLoading] = useState(false);
+  const [loading, setLoading] = useState(() => !traces.length && !summaryData);
+  const [error, setError] = useState(null);
+
+  const fetchTraces = useCallback(async (force = false) => {
+    if (!traces.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const params = {
@@ -33,8 +35,8 @@ export default function Traces() {
       if (statusFilter) params.status = statusFilter;
 
       const [tracesRes, summaryRes] = await Promise.all([
-        getTraces(params),
-        getTraceSummary().catch(() => null),
+        getTraces(params, { forceRefresh: force }),
+        getTraceSummary({ forceRefresh: force }).catch(() => null),
       ]);
 
       setTraces(tracesRes.data || []);
@@ -45,7 +47,7 @@ export default function Traces() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, statusFilter]);
+  }, [page, pageSize, statusFilter, traces.length]);
 
   useEffect(() => {
     fetchTraces();
@@ -128,9 +130,6 @@ export default function Traces() {
       <div className="page-header">
         <div>
           <h2 className="page-title">End-to-End Decision Traces</h2>
-          <p className="page-desc">
-            Complete lifecycle lineage linking raw packet telemetry, ML predictions, policy decisions, and traffic shaping.
-          </p>
         </div>
 
         <div className="header-actions">
@@ -147,10 +146,7 @@ export default function Traces() {
             <option value="PARTIAL">PARTIAL</option>
           </select>
 
-          <button onClick={fetchTraces} className="btn btn-secondary">
-            <IconRefresh size={14} />
-            <span>Refresh</span>
-          </button>
+          <RefreshButton onRefresh={fetchTraces} />
         </div>
       </div>
 
@@ -160,7 +156,7 @@ export default function Traces() {
           title="Indexed Traces"
           value={summary.total_traces || totalRecords}
           icon={IconTraces}
-          accent="cyan"
+          accent="amber"
         />
         <StatCard
           title="Complete 7-Stage Traces"
@@ -185,7 +181,7 @@ export default function Traces() {
         />
       </div>
 
-      <div className="traces-layout-split">
+      <div className={`traces-layout-split ${selectedTrace ? 'has-detail' : ''}`}>
         {/* Left Side: Traces Table */}
         <div className="content-card traces-table-card">
           <h3 className="card-heading">Decision Traces Registry</h3>

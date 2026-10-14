@@ -1,7 +1,7 @@
-# Network Monitoring Agent & Controller Layer (Phases 4 & 5)
+# Network Monitoring Agent & Controller Layer
 
 ## 1. Overview
-The networking layer provides low-overhead, C-based endpoint monitoring and central telemetry aggregation across the Small LAN / Mininet environment.
+The networking layer provides lightweight endpoint monitoring and central telemetry aggregation across the Small LAN / Mininet environment, implemented in Python with direct CLI entrypoints.
 
 ```
              MININET LAN / HOSTS
@@ -19,13 +19,13 @@ The networking layer provides low-overhead, C-based endpoint monitoring and cent
           (Pipe-delimited stream)
                       │
                       ▼
-            C NETWORK CONTROLLER
+            NETWORK CONTROLLER
            (network_controller:5000)
                       │
             ┌─────────┴─────────┐
             ▼                   ▼
-      Console Output     CSV Socket Logs
-                       (data/socket_logs/)
+      Console Output     CSV / JSONL Logs
+                       (data/monitoring/)
 ```
 
 ---
@@ -35,22 +35,34 @@ The networking layer provides low-overhead, C-based endpoint monitoring and cent
 ```
 network/
 ├── agent/
-│   ├── monitor_agent.c          # Agent CLI, sampling loop, and signal handling
-│   ├── monitor_agent.h          # Agent configuration definitions
-│   ├── flow_monitor.c           # /proc/net/tcp & /proc/net/udp flow detection
-│   ├── flow_monitor.h           # Flow data structures
-│   ├── network_stats.c          # Interface throughput and timestamp calculations
-│   ├── network_stats.h          # Network statistics structures
-│   ├── socket_client.c          # TCP socket streaming client, send_all, and reconnect
-│   ├── socket_client.h          # TCP socket client definitions
+│   ├── monitor_agent.py         # Agent CLI, sampling loop, and signal handling
+│   ├── flow_monitor.py          # /proc/net/tcp & /proc/net/udp flow detection
+│   ├── network_stats.py         # Interface throughput and timestamp calculations
+│   ├── socket_client.py         # TCP socket streaming client, send_all, and reconnect
+│   ├── main.py                  # Standby skeleton entrypoint
+│   ├── monitor_agent            # Executable script
 │   └── Makefile                 # Module Makefile
 ├── controller/
-│   ├── network_controller.c     # Multi-threaded TCP server listening on port 5000
-│   ├── network_controller.h     # Controller configuration definitions
-│   ├── client_handler.c         # Per-client thread worker with stream buffer & validator
-│   ├── client_handler.h         # Client handler definitions
+│   ├── network_controller.py    # Multi-threaded TCP server listening on port 5000
+│   ├── client_handler.py        # Per-client thread worker with stream buffer & validator
+│   ├── adaptive_controller.py   # Adaptive Traffic Controller (Phase 14)
+│   ├── control_interface.py     # Intent dispatcher and rule lifecycle manager
+│   ├── flow_mapper.py           # 5-tuple parsing, device IP & interface resolution
+│   ├── tc_manager.py            # Linux traffic control (tc) HTB hierarchy manager
+│   ├── control_logger.py        # State and action audit logger
+│   ├── rollback.py              # Interface reset and rollback operations
+│   ├── main.py                  # Standby skeleton entrypoint
+│   ├── network_controller       # Executable script
+│   ├── adaptive_controller      # Executable script
 │   ├── Makefile                 # Module Makefile
 │   └── README.md                # Controller & protocol documentation
+├── ingestion/
+│   ├── record_parser.py         # Pipe-delimited record parser
+│   ├── data_validator.py        # Schema and network ranges integrity validator
+│   ├── data_store.py            # Ring buffer, device tracking, and CSV/JSONL store
+│   ├── data_ingestion.py        # Global ingestion pipeline manager
+│   ├── Makefile                 # Module Makefile
+│   └── README.md                # Ingestion documentation
 ├── topology/
 │   ├── lan_topology.py          # Mininet Small LAN topology
 │   └── README.md                # Topology documentation
@@ -60,8 +72,9 @@ network/
 │   ├── config.py                # Network and flow configuration
 │   └── README.md                # Traffic generator documentation
 ├── common/
-│   └── protocol.h               # Common protocol header
-├── Makefile                     # Top-level build system
+│   ├── protocol.py              # Common protocol binary headers & enums
+│   └── __init__.py              # Common exports
+├── Makefile                     # Top-level build/target manager
 └── README.md                    # Networking layer documentation
 ```
 
@@ -69,7 +82,7 @@ network/
 
 ## 3. Quick Start & Execution
 
-### A. Compile Everything
+### A. Setup Executables
 ```bash
 make clean && make all
 ```

@@ -1,31 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { getProfilingBehaviors, getProfilingClusters } from '../services/api';
+import { getProfilingBehaviors, getProfilingClusters, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import StatusBadge from '../components/StatusBadge';
 import { BarChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconProfiling, IconRefresh } from '../components/Icons';
+import { IconProfiling } from '../components/Icons';
 import { formatMbps, formatPercent } from '../utils/formatters';
 
 export default function Profiling() {
-  const [behaviors, setBehaviors] = useState([]);
-  const [clustersInfo, setClustersInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [behaviors, setBehaviors] = useState(() => getCachedData('/profiling/behaviors')?.data || []);
+  const [clustersInfo, setClustersInfo] = useState(() => getCachedData('/profiling/clusters'));
+  const hasCache = Boolean(behaviors.length || clustersInfo);
+  const [loading, setLoading] = useState(!hasCache);
   const [error, setError] = useState(null);
 
-  const fetchProfilingData = async () => {
-    setLoading(true);
+  const fetchProfilingData = async (force = false) => {
+    if (!behaviors.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const [behaviorsRes, clustersRes] = await Promise.all([
-        getProfilingBehaviors(),
-        getProfilingClusters(),
+        getProfilingBehaviors({}, { forceRefresh: force }),
+        getProfilingClusters({ forceRefresh: force }),
       ]);
 
-      setBehaviors(behaviorsRes.data || []);
-      setClustersInfo(clustersRes);
+      if (behaviorsRes?.data) setBehaviors(behaviorsRes.data);
+      if (clustersRes) setClustersInfo(clustersRes);
     } catch (err) {
       setError(err.message || 'Failed to fetch device profiling data.');
     } finally {
@@ -34,11 +38,11 @@ export default function Profiling() {
   };
 
   useEffect(() => {
-    fetchProfilingData();
+    fetchProfilingData(false);
   }, []);
 
-  if (loading) return <LoadingState message="Loading device behavioral profiles..." />;
-  if (error) return <ErrorState message={error} onRetry={fetchProfilingData} />;
+  if (loading && !behaviors.length) return <LoadingState message="Loading device behavioral profiles..." />;
+  if (error && !behaviors.length) return <ErrorState message={error} onRetry={() => fetchProfilingData(true)} />;
 
   const clustersList = clustersInfo?.clusters || [];
   const evalMetrics = clustersInfo?.evaluation || {};
@@ -47,20 +51,20 @@ export default function Profiling() {
   const clusterChartData = clustersList.map((c) => ({
     label: `Cluster ${c.cluster_id || c.cluster || 'N/A'}: ${c.label || c.cluster_name || 'Profile'}`,
     value: c.device_count || c.size || 1,
-    color: '#3b82f6',
+    color: '#7c3aed',
   }));
 
   const behaviorColumns = [
     {
       key: 'device_id',
       label: 'Host / Device',
-      width: '120px',
+      width: '95px',
       render: (val) => <span className="device-tag">{val || '—'}</span>,
     },
     {
       key: 'cluster_id',
       label: 'Assigned Cluster',
-      width: '140px',
+      width: '125px',
       render: (val) => <StatusBadge type="cluster" value={`Cluster ${val}`} />,
     },
     {
@@ -95,14 +99,8 @@ export default function Profiling() {
       <div className="page-header">
         <div>
           <h2 className="page-title">Device & User Behavior Profiling</h2>
-          <p className="page-desc">
-            K-Means unsupervised clustering grouping LAN hosts by behavioral telemetry patterns.
-          </p>
         </div>
-        <button onClick={fetchProfilingData} className="btn btn-secondary">
-          <IconRefresh size={14} />
-          <span>Refresh</span>
-        </button>
+        <RefreshButton onRefresh={fetchProfilingData} />
       </div>
 
       {/* Profiling Evaluation Stats */}
@@ -112,14 +110,14 @@ export default function Profiling() {
           value={behaviors.length}
           subtext="Categorized network nodes"
           icon={IconProfiling}
-          accent="cyan"
+          accent="amber"
         />
         <StatCard
           title="Optimal Clusters (K)"
           value={clustersList.length || 3}
           subtext="K-Means optimal partition"
           icon={IconProfiling}
-          accent="blue"
+          accent="coral"
         />
         <StatCard
           title="Silhouette Score"
@@ -154,8 +152,7 @@ export default function Profiling() {
           <BarChart
             title="Cluster Population Distribution"
             data={clusterChartData}
-            barColor="#8b5cf6"
-            height={220}
+            barColor="#7c3aed"
           />
         </div>
 

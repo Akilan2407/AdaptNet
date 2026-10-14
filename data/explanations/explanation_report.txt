@@ -4,31 +4,33 @@
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000047
-Timestamp: 2026-09-12 16:01:27 | Device: h1 | Status: SUCCESS
-Flow: h1_192.168.1.10:45672->192.168.1.11:5201_TCP
+DECISION EXPLANATION: TRC-002556
+Timestamp: 2026-09-12 16:17:02 | Device: h1 | Status: SUCCESS
+Flow: h1_192.168.1.10:35354->192.168.1.14:5201_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 51.89
+   * rtt_ms: 27.89
+   * packet_loss_percent: 1.07
+   * active_connections: 13
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: 0.3644
-   * Congestion Class: MEDIUM
+   * Predicted Score: 0.3009
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   1. total_flow_count = 1.0 (SHAP: -0.0075, decreased)
-   2. cluster_id = 1.0 (SHAP: +0.0069, increased)
-   3. throughput_mbps = 0.0 (SHAP: +0.0000, neutral)
+   1. throughput_mbps = 51.89 (SHAP: +0.0184, increased)
+   2. active_connections = 13.0 (SHAP: +0.0159, increased)
+   3. rtt_ms = 27.89 (SHAP: +0.0110, increased)
 
 4. TRAFFIC CLASSIFICATION
    * Class: BULK_TRANSFER
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_BULK_MED_CONGESTION
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
    * Priority: LOW
-   * Reason: BULK_TRANSFER traffic during MEDIUM predicted congestion received LOW priority.
+   * Reason: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
@@ -38,89 +40,140 @@ Flow: h1_192.168.1.10:45672->192.168.1.11:5201_TCP
 
 EXPLANATION
 -----------
-For device h1, flow h1_192.168.1.10:45672->192.168.1.11:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h1, flow h1_192.168.1.10:35354->192.168.1.14:5201_TCP, observed network conditions included an RTT of 27.9 ms, packet loss of 1.07%, throughput of 51.89 Mbps, 13 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model predicted a congestion score of 0.3644, corresponding to MEDIUM congestion. The primary model contributions were: total_flow_count (1.0) decreased the predicted congestion score (SHAP: -0.0075); cluster_id (1.0) increased the predicted congestion score (SHAP: +0.0069); throughput_mbps (0.0) had a neutral effect on the predicted congestion score (SHAP: +0.0000). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
+The GRU congestion model predicted a congestion score of 0.3009, corresponding to LOW congestion. The primary model contributions were: throughput_mbps (51.89) increased the predicted congestion score (SHAP: +0.0184); active_connections (13.0) increased the predicted congestion score (SHAP: +0.0159); rtt_ms (27.89) increased the predicted congestion score (SHAP: +0.0110). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 1 ('High-Flow-Activity').
+The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('High-Throughput').
 
-The QoS policy engine applied rule POLICY_BULK_MED_CONGESTION and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during MEDIUM predicted congestion received LOW priority.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 The traffic control action APPLY (HTB class 1:40) on interface s1-eth1 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000051
-Timestamp: 2026-09-12 16:01:28 | Device: h4 | Status: SUCCESS
-Flow: h4_192.168.1.13:45672->192.168.1.14:5201_TCP
+DECISION EXPLANATION: TRC-002557
+Timestamp: 2026-09-12 16:17:02 | Device: h2 | Status: SUCCESS
+Flow: h2_192.168.1.11:34654->192.168.1.13:443_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 7.66
+   * rtt_ms: 11.32
+   * packet_loss_percent: 0.15
+   * active_connections: 5
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: 0.3604
-   * Congestion Class: MEDIUM
+   * Predicted Score: 0.0489
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   1. total_flow_count = 1.0 (SHAP: +0.0054, increased)
-   2. cluster_id = 0.0 (SHAP: -0.0046, decreased)
-   3. throughput_mbps = 0.0 (SHAP: +0.0000, neutral)
+   1. packet_loss_percent = 0.15 (SHAP: -0.0298, decreased)
+   2. active_connections = 5.0 (SHAP: -0.0246, decreased)
+   3. throughput_mbps = 7.66 (SHAP: -0.0121, decreased)
 
 4. TRAFFIC CLASSIFICATION
-   * Class: BULK_TRANSFER
+   * Class: WEB
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_BULK_MED_CONGESTION
-   * Priority: LOW
-   * Reason: BULK_TRANSFER traffic during MEDIUM predicted congestion received LOW priority.
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
+   * Priority: MEDIUM
+   * Reason: WEB traffic during LOW predicted congestion received default base priority MEDIUM.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
-   * Target Class: 1:40
+   * Target Class: 1:20
    * Status: DRY_RUN
-   * Interface: s1-eth4
+   * Interface: s1-eth2
 
 EXPLANATION
 -----------
-For device h4, flow h4_192.168.1.13:45672->192.168.1.14:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h2, flow h2_192.168.1.11:34654->192.168.1.13:443_TCP, observed network conditions included an RTT of 11.3 ms, packet loss of 0.15%, throughput of 7.66 Mbps, 5 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model predicted a congestion score of 0.3604, corresponding to MEDIUM congestion. The primary model contributions were: total_flow_count (1.0) increased the predicted congestion score (SHAP: +0.0054); cluster_id (0.0) decreased the predicted congestion score (SHAP: -0.0046); throughput_mbps (0.0) had a neutral effect on the predicted congestion score (SHAP: +0.0000). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
+The GRU congestion model predicted a congestion score of 0.0489, corresponding to LOW congestion. The primary model contributions were: packet_loss_percent (0.15) decreased the predicted congestion score (SHAP: -0.0298); active_connections (5.0) decreased the predicted congestion score (SHAP: -0.0246); throughput_mbps (7.66) decreased the predicted congestion score (SHAP: -0.0121). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('Low-Activity').
+The flow was classified as WEB based on configured traffic classification rules. The device was grouped into behavior profile cluster 1 ('Baseline-Activity (C1)').
 
-The QoS policy engine applied rule POLICY_BULK_MED_CONGESTION and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during MEDIUM predicted congestion received LOW priority.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned MEDIUM priority. Policy rationale: WEB traffic during LOW predicted congestion received default base priority MEDIUM.
 
-The traffic control action APPLY (HTB class 1:40) on interface s1-eth4 was simulated in dry-run mode and was not applied to the live network.
+The traffic control action APPLY (HTB class 1:20) on interface s1-eth2 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000052
-Timestamp: 2026-09-12 16:01:28 | Device: h5 | Status: SUCCESS
-Flow: h5_192.168.1.14:45672->192.168.1.10:5201_TCP
+DECISION EXPLANATION: TRC-002558
+Timestamp: 2026-09-12 16:17:02 | Device: h3 | Status: SUCCESS
+Flow: h3_192.168.1.12:33585->192.168.1.13:5004_UDP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 26.07
+   * packet_loss_percent: 0.87
+   * active_connections: 5
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: 0.3534
-   * Congestion Class: MEDIUM
+   * Predicted Score: 0.1902
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   1. cluster_id = 0.0 (SHAP: -0.0050, decreased)
-   2. total_flow_count = 1.0 (SHAP: +0.0037, increased)
-   3. throughput_mbps = 0.0 (SHAP: +0.0000, neutral)
+   1. udp_flow_ratio = 0.0 (SHAP: -0.0113, decreased)
+   2. tcp_flow_ratio = 1.0 (SHAP: +0.0091, increased)
+   3. packet_loss_percent = 0.87 (SHAP: -0.0136, decreased)
+
+4. TRAFFIC CLASSIFICATION
+   * Class: REAL_TIME
+
+5. QOS POLICY DECISION
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
+   * Priority: HIGH
+   * Reason: REAL_TIME traffic during LOW predicted congestion received default base priority HIGH.
+
+6. NETWORK CONTROL ACTION
+   * Action: APPLY
+   * Target Class: 1:10
+   * Status: DRY_RUN
+   * Interface: s1-eth3
+
+EXPLANATION
+-----------
+For device h3, flow h3_192.168.1.12:33585->192.168.1.13:5004_UDP, observed network conditions included packet loss of 0.87%, throughput of 26.07 Mbps, 5 active connection(s), and 1 concurrent flow(s).
+
+The GRU congestion model predicted a congestion score of 0.1902, corresponding to LOW congestion. The primary model contributions were: udp_flow_ratio (0.0) decreased the predicted congestion score (SHAP: -0.0113); tcp_flow_ratio (1.0) increased the predicted congestion score (SHAP: +0.0091); packet_loss_percent (0.87) decreased the predicted congestion score (SHAP: -0.0136). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
+
+The flow was classified as REAL_TIME based on configured traffic classification rules. The device was grouped into behavior profile cluster 2 ('Baseline-Activity (C2)').
+
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned HIGH priority. Policy rationale: REAL_TIME traffic during LOW predicted congestion received default base priority HIGH.
+
+The traffic control action APPLY (HTB class 1:10) on interface s1-eth3 was simulated in dry-run mode and was not applied to the live network.
+================================================================================
+
+================================================================================
+DECISION EXPLANATION: TRC-002560
+Timestamp: 2026-09-12 16:17:02 | Device: h5 | Status: SUCCESS
+Flow: h5_192.168.1.14:50589->192.168.1.10:5201_TCP
+--------------------------------------------------------------------------------
+1. NETWORK OBSERVATION
+   * throughput_mbps: 21.6
+   * rtt_ms: 13.18
+   * packet_loss_percent: 0.54
+   * active_connections: 6
+   * total_flow_count: 1
+
+2. CONGESTION PREDICTION
+   * Predicted Score: 0.1136
+   * Congestion Class: LOW
+
+3. MAIN MODEL CONTRIBUTIONS (SHAP)
+   1. packet_loss_percent = 0.54 (SHAP: -0.0338, decreased)
+   2. throughput_std = 0.0 (SHAP: -0.0227, decreased)
+   3. rtt_std = 0.0 (SHAP: +0.0227, increased)
 
 4. TRAFFIC CLASSIFICATION
    * Class: BULK_TRANSFER
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_BULK_MED_CONGESTION
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
    * Priority: LOW
-   * Reason: BULK_TRANSFER traffic during MEDIUM predicted congestion received LOW priority.
+   * Reason: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
@@ -130,321 +183,301 @@ Flow: h5_192.168.1.14:45672->192.168.1.10:5201_TCP
 
 EXPLANATION
 -----------
-For device h5, flow h5_192.168.1.14:45672->192.168.1.10:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h5, flow h5_192.168.1.14:50589->192.168.1.10:5201_TCP, observed network conditions included an RTT of 13.2 ms, packet loss of 0.54%, throughput of 21.60 Mbps, 6 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model predicted a congestion score of 0.3534, corresponding to MEDIUM congestion. The primary model contributions were: cluster_id (0.0) decreased the predicted congestion score (SHAP: -0.0050); total_flow_count (1.0) increased the predicted congestion score (SHAP: +0.0037); throughput_mbps (0.0) had a neutral effect on the predicted congestion score (SHAP: +0.0000). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
+The GRU congestion model predicted a congestion score of 0.1136, corresponding to LOW congestion. The primary model contributions were: packet_loss_percent (0.54) decreased the predicted congestion score (SHAP: -0.0338); throughput_std (0.0) decreased the predicted congestion score (SHAP: -0.0227); rtt_std (0.0) increased the predicted congestion score (SHAP: +0.0227). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('Low-Activity').
+The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('High-Throughput').
 
-The QoS policy engine applied rule POLICY_BULK_MED_CONGESTION and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during MEDIUM predicted congestion received LOW priority.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 The traffic control action APPLY (HTB class 1:40) on interface s1-eth5 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000001
-Timestamp: 2026-09-12 15:24:45 | Device: h1 | Status: PARTIAL
-Flow: h1_192.168.1.10:45672->192.168.1.11:5201_TCP
+DECISION EXPLANATION: TRC-002561
+Timestamp: 2026-09-12 16:17:04 | Device: h1 | Status: SUCCESS
+Flow: h1_192.168.1.10:43091->192.168.1.11:5201_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 51.44
+   * rtt_ms: 26.76
+   * packet_loss_percent: 1.04
+   * active_connections: 12
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: N/A
-   * Congestion Class: UNKNOWN
+   * Predicted Score: 0.3009
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   (SHAP feature attributions not generated for this trace)
+   1. throughput_mbps = 51.44 (SHAP: +0.0168, increased)
+   2. active_connections = 12.0 (SHAP: +0.0148, increased)
+   3. cluster_id = 0.0 (SHAP: -0.0124, decreased)
 
 4. TRAFFIC CLASSIFICATION
    * Class: BULK_TRANSFER
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_UNKNOWN_CONGESTION_FALLBACK
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
    * Priority: LOW
-   * Reason: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+   * Reason: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
    * Target Class: 1:40
-   * Status: SKIPPED
+   * Status: DRY_RUN
    * Interface: s1-eth1
 
 EXPLANATION
 -----------
-For device h1, flow h1_192.168.1.10:45672->192.168.1.11:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h1, flow h1_192.168.1.10:43091->192.168.1.11:5201_TCP, observed network conditions included an RTT of 26.8 ms, packet loss of 1.04%, throughput of 51.44 Mbps, 12 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model did not output a time-series forecast for this sample, defaulting to UNKNOWN congestion status. Detailed SHAP feature attributions were not available for this prediction.
+The GRU congestion model predicted a congestion score of 0.3009, corresponding to LOW congestion. The primary model contributions were: throughput_mbps (51.44) increased the predicted congestion score (SHAP: +0.0168); active_connections (12.0) increased the predicted congestion score (SHAP: +0.0148); cluster_id (0.0) decreased the predicted congestion score (SHAP: -0.0124). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 1 ('High-Flow-Activity').
+The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('High-Throughput').
 
-The QoS policy engine applied rule POLICY_UNKNOWN_CONGESTION_FALLBACK and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
-The traffic control action was skipped on interface s1-eth1.
+The traffic control action APPLY (HTB class 1:40) on interface s1-eth1 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000002
-Timestamp: 2026-09-12 15:24:46 | Device: h1 | Status: PARTIAL
-Flow: h1_192.168.1.10:45672->192.168.1.11:5201_TCP
+DECISION EXPLANATION: TRC-002562
+Timestamp: 2026-09-12 16:17:04 | Device: h2 | Status: SUCCESS
+Flow: h2_192.168.1.11:52774->192.168.1.12:443_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 8.01
+   * rtt_ms: 12.24
+   * packet_loss_percent: 0.11
+   * active_connections: 4
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: N/A
-   * Congestion Class: UNKNOWN
+   * Predicted Score: 0.0489
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   (SHAP feature attributions not generated for this trace)
+   1. packet_loss_percent = 0.11 (SHAP: -0.0362, decreased)
+   2. active_connections = 4.0 (SHAP: -0.0270, decreased)
+   3. throughput_mbps = 8.01 (SHAP: -0.0118, decreased)
 
 4. TRAFFIC CLASSIFICATION
-   * Class: BULK_TRANSFER
+   * Class: WEB
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_UNKNOWN_CONGESTION_FALLBACK
-   * Priority: LOW
-   * Reason: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
+   * Priority: MEDIUM
+   * Reason: WEB traffic during LOW predicted congestion received default base priority MEDIUM.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
-   * Target Class: 1:40
-   * Status: SKIPPED
-   * Interface: s1-eth1
-
-EXPLANATION
------------
-For device h1, flow h1_192.168.1.10:45672->192.168.1.11:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
-
-The GRU congestion model did not output a time-series forecast for this sample, defaulting to UNKNOWN congestion status. Detailed SHAP feature attributions were not available for this prediction.
-
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 1 ('High-Flow-Activity').
-
-The QoS policy engine applied rule POLICY_UNKNOWN_CONGESTION_FALLBACK and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
-
-The traffic control action was skipped on interface s1-eth1.
-================================================================================
-
-================================================================================
-DECISION EXPLANATION: TRC-000003
-Timestamp: 2026-09-12 15:24:46 | Device: h2 | Status: PARTIAL
-Flow: h2_192.168.1.11:45672->192.168.1.12:5201_TCP
---------------------------------------------------------------------------------
-1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
-   * total_flow_count: 1
-
-2. CONGESTION PREDICTION
-   * Predicted Score: N/A
-   * Congestion Class: UNKNOWN
-
-3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   (SHAP feature attributions not generated for this trace)
-
-4. TRAFFIC CLASSIFICATION
-   * Class: BULK_TRANSFER
-
-5. QOS POLICY DECISION
-   * Rule ID: POLICY_UNKNOWN_CONGESTION_FALLBACK
-   * Priority: LOW
-   * Reason: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
-
-6. NETWORK CONTROL ACTION
-   * Action: APPLY
-   * Target Class: 1:40
-   * Status: SKIPPED
+   * Target Class: 1:20
+   * Status: DRY_RUN
    * Interface: s1-eth2
 
 EXPLANATION
 -----------
-For device h2, flow h2_192.168.1.11:45672->192.168.1.12:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h2, flow h2_192.168.1.11:52774->192.168.1.12:443_TCP, observed network conditions included an RTT of 12.2 ms, packet loss of 0.11%, throughput of 8.01 Mbps, 4 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model did not output a time-series forecast for this sample, defaulting to UNKNOWN congestion status. Detailed SHAP feature attributions were not available for this prediction.
+The GRU congestion model predicted a congestion score of 0.0489, corresponding to LOW congestion. The primary model contributions were: packet_loss_percent (0.11) decreased the predicted congestion score (SHAP: -0.0362); active_connections (4.0) decreased the predicted congestion score (SHAP: -0.0270); throughput_mbps (8.01) decreased the predicted congestion score (SHAP: -0.0118). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('Low-Activity').
+The flow was classified as WEB based on configured traffic classification rules. The device was grouped into behavior profile cluster 1 ('Baseline-Activity (C1)').
 
-The QoS policy engine applied rule POLICY_UNKNOWN_CONGESTION_FALLBACK and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned MEDIUM priority. Policy rationale: WEB traffic during LOW predicted congestion received default base priority MEDIUM.
 
-The traffic control action was skipped on interface s1-eth2.
+The traffic control action APPLY (HTB class 1:20) on interface s1-eth2 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000004
-Timestamp: 2026-09-12 15:24:46 | Device: h3 | Status: PARTIAL
-Flow: h3_192.168.1.12:45672->192.168.1.13:5201_TCP
+DECISION EXPLANATION: TRC-002563
+Timestamp: 2026-09-12 16:17:04 | Device: h3 | Status: SUCCESS
+Flow: h3_192.168.1.12:45711->192.168.1.10:5201_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 29.33
+   * rtt_ms: 18.91
+   * packet_loss_percent: 1.17
+   * active_connections: 5
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: N/A
-   * Congestion Class: UNKNOWN
+   * Predicted Score: 0.1902
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   (SHAP feature attributions not generated for this trace)
+   1. udp_flow_ratio = 0.0 (SHAP: -0.0109, decreased)
+   2. tcp_flow_ratio = 1.0 (SHAP: +0.0109, increased)
+   3. active_connections = 5.0 (SHAP: -0.0033, decreased)
 
 4. TRAFFIC CLASSIFICATION
    * Class: BULK_TRANSFER
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_UNKNOWN_CONGESTION_FALLBACK
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
    * Priority: LOW
-   * Reason: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+   * Reason: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
    * Target Class: 1:40
-   * Status: SKIPPED
+   * Status: DRY_RUN
    * Interface: s1-eth3
 
 EXPLANATION
 -----------
-For device h3, flow h3_192.168.1.12:45672->192.168.1.13:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h3, flow h3_192.168.1.12:45711->192.168.1.10:5201_TCP, observed network conditions included an RTT of 18.9 ms, packet loss of 1.17%, throughput of 29.33 Mbps, 5 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model did not output a time-series forecast for this sample, defaulting to UNKNOWN congestion status. Detailed SHAP feature attributions were not available for this prediction.
+The GRU congestion model predicted a congestion score of 0.1902, corresponding to LOW congestion. The primary model contributions were: udp_flow_ratio (0.0) decreased the predicted congestion score (SHAP: -0.0109); tcp_flow_ratio (1.0) increased the predicted congestion score (SHAP: +0.0109); active_connections (5.0) decreased the predicted congestion score (SHAP: -0.0033). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('Low-Activity').
+The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 2 ('Baseline-Activity (C2)').
 
-The QoS policy engine applied rule POLICY_UNKNOWN_CONGESTION_FALLBACK and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
-The traffic control action was skipped on interface s1-eth3.
+The traffic control action APPLY (HTB class 1:40) on interface s1-eth3 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000005
-Timestamp: 2026-09-12 15:24:46 | Device: h4 | Status: PARTIAL
-Flow: h4_192.168.1.13:45672->192.168.1.14:5201_TCP
+DECISION EXPLANATION: TRC-002564
+Timestamp: 2026-09-12 16:17:04 | Device: h4 | Status: SUCCESS
+Flow: h4_192.168.1.13:47153->192.168.1.14:5432_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 22.17
+   * rtt_ms: 18.06
+   * packet_loss_percent: 0.36
+   * active_connections: 9
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: N/A
-   * Congestion Class: UNKNOWN
+   * Predicted Score: 0.1343
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   (SHAP feature attributions not generated for this trace)
+   1. packet_loss_percent = 0.36 (SHAP: -0.0234, decreased)
+   2. throughput_mbps = 22.17 (SHAP: -0.0015, decreased)
+   3. rtt_std = 0.0 (SHAP: -0.0072, decreased)
 
 4. TRAFFIC CLASSIFICATION
    * Class: BULK_TRANSFER
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_UNKNOWN_CONGESTION_FALLBACK
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
    * Priority: LOW
-   * Reason: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+   * Reason: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
    * Target Class: 1:40
-   * Status: SKIPPED
+   * Status: DRY_RUN
    * Interface: s1-eth4
 
 EXPLANATION
 -----------
-For device h4, flow h4_192.168.1.13:45672->192.168.1.14:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h4, flow h4_192.168.1.13:47153->192.168.1.14:5432_TCP, observed network conditions included an RTT of 18.1 ms, packet loss of 0.36%, throughput of 22.17 Mbps, 9 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model did not output a time-series forecast for this sample, defaulting to UNKNOWN congestion status. Detailed SHAP feature attributions were not available for this prediction.
+The GRU congestion model predicted a congestion score of 0.1343, corresponding to LOW congestion. The primary model contributions were: packet_loss_percent (0.36) decreased the predicted congestion score (SHAP: -0.0234); throughput_mbps (22.17) decreased the predicted congestion score (SHAP: -0.0015); rtt_std (0.0) decreased the predicted congestion score (SHAP: -0.0072). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('Low-Activity').
+The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 1 ('Baseline-Activity (C1)').
 
-The QoS policy engine applied rule POLICY_UNKNOWN_CONGESTION_FALLBACK and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
-The traffic control action was skipped on interface s1-eth4.
+The traffic control action APPLY (HTB class 1:40) on interface s1-eth4 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000006
-Timestamp: 2026-09-12 15:24:46 | Device: h5 | Status: PARTIAL
-Flow: h5_192.168.1.14:45672->192.168.1.10:5201_TCP
+DECISION EXPLANATION: TRC-002565
+Timestamp: 2026-09-12 16:17:04 | Device: h5 | Status: SUCCESS
+Flow: h5_192.168.1.14:45285->192.168.1.10:5201_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 21.33
+   * rtt_ms: 14.8
+   * packet_loss_percent: 0.53
+   * active_connections: 6
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: N/A
-   * Congestion Class: UNKNOWN
+   * Predicted Score: 0.1136
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   (SHAP feature attributions not generated for this trace)
+   1. packet_loss_percent = 0.53 (SHAP: -0.0269, decreased)
+   2. rtt_std = 0.0 (SHAP: +0.0250, increased)
+   3. throughput_std = 0.0 (SHAP: -0.0236, decreased)
 
 4. TRAFFIC CLASSIFICATION
    * Class: BULK_TRANSFER
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_UNKNOWN_CONGESTION_FALLBACK
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
    * Priority: LOW
-   * Reason: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+   * Reason: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
    * Target Class: 1:40
-   * Status: SKIPPED
+   * Status: DRY_RUN
    * Interface: s1-eth5
 
 EXPLANATION
 -----------
-For device h5, flow h5_192.168.1.14:45672->192.168.1.10:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h5, flow h5_192.168.1.14:45285->192.168.1.10:5201_TCP, observed network conditions included an RTT of 14.8 ms, packet loss of 0.53%, throughput of 21.33 Mbps, 6 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model did not output a time-series forecast for this sample, defaulting to UNKNOWN congestion status. Detailed SHAP feature attributions were not available for this prediction.
+The GRU congestion model predicted a congestion score of 0.1136, corresponding to LOW congestion. The primary model contributions were: packet_loss_percent (0.53) decreased the predicted congestion score (SHAP: -0.0269); rtt_std (0.0) increased the predicted congestion score (SHAP: +0.0250); throughput_std (0.0) decreased the predicted congestion score (SHAP: -0.0236). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('Low-Activity').
+The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('High-Throughput').
 
-The QoS policy engine applied rule POLICY_UNKNOWN_CONGESTION_FALLBACK and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
-The traffic control action was skipped on interface s1-eth5.
+The traffic control action APPLY (HTB class 1:40) on interface s1-eth5 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================
 
 ================================================================================
-DECISION EXPLANATION: TRC-000007
-Timestamp: 2026-09-12 15:24:47 | Device: h1 | Status: PARTIAL
-Flow: h1_192.168.1.10:45672->192.168.1.11:5201_TCP
+DECISION EXPLANATION: TRC-002566
+Timestamp: 2026-09-12 16:17:06 | Device: h1 | Status: SUCCESS
+Flow: h1_192.168.1.10:41489->192.168.1.11:5201_TCP
 --------------------------------------------------------------------------------
 1. NETWORK OBSERVATION
-   * throughput_mbps: 0.0
-   * active_connections: 0
+   * throughput_mbps: 45.22
+   * rtt_ms: 26.75
+   * packet_loss_percent: 1.17
+   * active_connections: 14
    * total_flow_count: 1
 
 2. CONGESTION PREDICTION
-   * Predicted Score: N/A
-   * Congestion Class: UNKNOWN
+   * Predicted Score: 0.2821
+   * Congestion Class: LOW
 
 3. MAIN MODEL CONTRIBUTIONS (SHAP)
-   (SHAP feature attributions not generated for this trace)
+   1. active_connections = 14.0 (SHAP: +0.0185, increased)
+   2. packet_loss_percent = 1.17 (SHAP: -0.0163, decreased)
+   3. throughput_mbps = 45.22 (SHAP: +0.0083, increased)
 
 4. TRAFFIC CLASSIFICATION
    * Class: BULK_TRANSFER
 
 5. QOS POLICY DECISION
-   * Rule ID: POLICY_UNKNOWN_CONGESTION_FALLBACK
+   * Rule ID: POLICY_LOW_CONGESTION_BASE
    * Priority: LOW
-   * Reason: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+   * Reason: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
 6. NETWORK CONTROL ACTION
    * Action: APPLY
    * Target Class: 1:40
-   * Status: SKIPPED
+   * Status: DRY_RUN
    * Interface: s1-eth1
 
 EXPLANATION
 -----------
-For device h1, flow h1_192.168.1.10:45672->192.168.1.11:5201_TCP, observed network conditions included throughput of 0.00 Mbps, 0 active connection(s), and 1 concurrent flow(s).
+For device h1, flow h1_192.168.1.10:41489->192.168.1.11:5201_TCP, observed network conditions included an RTT of 26.8 ms, packet loss of 1.17%, throughput of 45.22 Mbps, 14 active connection(s), and 1 concurrent flow(s).
 
-The GRU congestion model did not output a time-series forecast for this sample, defaulting to UNKNOWN congestion status. Detailed SHAP feature attributions were not available for this prediction.
+The GRU congestion model predicted a congestion score of 0.2821, corresponding to LOW congestion. The primary model contributions were: active_connections (14.0) increased the predicted congestion score (SHAP: +0.0185); packet_loss_percent (1.17) decreased the predicted congestion score (SHAP: -0.0163); throughput_mbps (45.22) increased the predicted congestion score (SHAP: +0.0083). These contributions reflect mathematical attribution toward the GRU model's score, not real-world causation.
 
-The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 1 ('High-Flow-Activity').
+The flow was classified as BULK_TRANSFER based on configured traffic classification rules. The device was grouped into behavior profile cluster 0 ('High-Throughput').
 
-The QoS policy engine applied rule POLICY_UNKNOWN_CONGESTION_FALLBACK and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic with UNKNOWN predicted congestion received default base priority LOW.
+The QoS policy engine applied rule POLICY_LOW_CONGESTION_BASE and assigned LOW priority. Policy rationale: BULK_TRANSFER traffic during LOW predicted congestion received default base priority LOW.
 
-The traffic control action was skipped on interface s1-eth1.
+The traffic control action APPLY (HTB class 1:40) on interface s1-eth1 was simulated in dry-run mode and was not applied to the live network.
 ================================================================================

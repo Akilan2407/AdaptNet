@@ -1,29 +1,31 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getPolicyDecisions, getPolicySummary } from '../services/api';
+import { getPolicyDecisions, getPolicySummary, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import StatusBadge from '../components/StatusBadge';
 import { DonutChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconPolicies, IconRefresh } from '../components/Icons';
+import { IconPolicies } from '../components/Icons';
 import { formatTimestamp } from '../utils/formatters';
 
 export default function Policies() {
-  const [decisions, setDecisions] = useState([]);
-  const [summaryData, setSummaryData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pagination & Filtering
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [priorityFilter, setPriorityFilter] = useState('');
   const [deviceFilter, setDeviceFilter] = useState('');
 
-  const fetchPolicyData = useCallback(async () => {
-    setLoading(true);
+  const [decisions, setDecisions] = useState(() => getCachedData('/policy/decisions', { limit: 15, offset: 0 })?.data || []);
+  const [summaryData, setSummaryData] = useState(() => getCachedData('/policy/summary'));
+  const [totalRecords, setTotalRecords] = useState(() => getCachedData('/policy/decisions', { limit: 15, offset: 0 })?.total || 0);
+  const [loading, setLoading] = useState(() => !decisions.length && !summaryData);
+  const [error, setError] = useState(null);
+
+  const fetchPolicyData = useCallback(async (force = false) => {
+    if (!decisions.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const params = {
@@ -34,8 +36,8 @@ export default function Policies() {
       if (deviceFilter) params.device_id = deviceFilter;
 
       const [decRes, summaryRes] = await Promise.all([
-        getPolicyDecisions(params),
-        getPolicySummary().catch(() => null),
+        getPolicyDecisions(params, { forceRefresh: force }),
+        getPolicySummary({ forceRefresh: force }).catch(() => null),
       ]);
 
       setDecisions(decRes.data || []);
@@ -46,7 +48,7 @@ export default function Policies() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, priorityFilter, deviceFilter]);
+  }, [page, pageSize, priorityFilter, deviceFilter, decisions.length]);
 
   useEffect(() => {
     fetchPolicyData();
@@ -54,10 +56,10 @@ export default function Policies() {
 
   const priorityDist = summaryData?.priority_distribution || {};
   const chartData = [
-    { label: 'HIGH', value: priorityDist.HIGH || 0, color: '#f43f5e' },
-    { label: 'MEDIUM', value: priorityDist.MEDIUM || 0, color: '#f59e0b' },
-    { label: 'NORMAL', value: priorityDist.NORMAL || 0, color: '#3b82f6' },
-    { label: 'LOW', value: priorityDist.LOW || 0, color: '#10b981' },
+    { label: 'HIGH', value: priorityDist.HIGH || 0, color: '#e11d48' },
+    { label: 'MEDIUM', value: priorityDist.MEDIUM || 0, color: '#ea580c' },
+    { label: 'NORMAL', value: priorityDist.NORMAL || 0, color: '#d97706' },
+    { label: 'LOW', value: priorityDist.LOW || 0, color: '#059669' },
   ].filter((d) => d.value > 0);
 
   const columns = [
@@ -113,9 +115,6 @@ export default function Policies() {
       <div className="page-header">
         <div>
           <h2 className="page-title">Deterministic QoS Policy Engine</h2>
-          <p className="page-desc">
-            Rule-based, explainable priority scheduling combining device profile, traffic class, and predicted congestion.
-          </p>
         </div>
 
         <div className="header-actions">
@@ -152,10 +151,7 @@ export default function Policies() {
             <option value="h5">Host h5</option>
           </select>
 
-          <button onClick={fetchPolicyData} className="btn btn-secondary">
-            <IconRefresh size={14} />
-            <span>Refresh</span>
-          </button>
+          <RefreshButton onRefresh={fetchPolicyData} />
         </div>
       </div>
 
@@ -195,7 +191,7 @@ export default function Policies() {
         <div className="grid-col">
           <DonutChart
             title="QoS Allocation Proportion"
-            data={chartData.length > 0 ? chartData : [{ label: 'LOW', value: 53, color: '#10b981' }]}
+            data={chartData.length > 0 ? chartData : [{ label: 'LOW', value: 53, color: '#059669' }]}
             centerText={String(totalRecords)}
             centerSubtext="Flows"
           />

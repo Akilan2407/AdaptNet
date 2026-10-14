@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { IconSearch } from './Icons';
+import { IconSearch, IconChevronLeft, IconChevronRight } from './Icons';
 
 export default function DataTable({
   columns = [],
@@ -57,7 +57,7 @@ export default function DataTable({
       {searchable && (
         <div className="table-toolbar">
           <div className="search-box">
-            <IconSearch size={14} color="#6b7280" />
+            <IconSearch size={14} color="#78716c" />
             <input
               type="text"
               placeholder={searchPlaceholder}
@@ -138,22 +138,25 @@ export default function DataTable({
       {pagination && (
         <div className="table-pagination">
           <span className="pagination-info">
-            Page {pagination.page + 1} of {Math.max(1, Math.ceil((pagination.total || 1) / (pagination.pageSize || 10)))}
+            Page <strong>{pagination.page + 1}</strong> of{' '}
+            <strong>{Math.max(1, Math.ceil((pagination.total || 1) / (pagination.pageSize || 10)))}</strong>
           </span>
           <div className="pagination-controls">
             <button
-              className="btn btn-sm"
+              className="btn btn-sm btn-secondary pagination-btn"
               disabled={pagination.page <= 0}
               onClick={() => pagination.onPageChange(pagination.page - 1)}
             >
-              Previous
+              <IconChevronLeft size={13} />
+              <span>Previous</span>
             </button>
             <button
-              className="btn btn-sm"
+              className="btn btn-sm btn-secondary pagination-btn"
               disabled={(pagination.page + 1) * pagination.pageSize >= (pagination.total || 0)}
               onClick={() => pagination.onPageChange(pagination.page + 1)}
             >
-              Next
+              <span>Next</span>
+              <IconChevronRight size={13} />
             </button>
           </div>
         </div>

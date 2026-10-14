@@ -3,41 +3,42 @@ import {
   getExplainabilityGlobal,
   getExplainabilityLocal,
   getExplainabilitySummary,
+  getCachedData,
 } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import { BarChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconExplainability, IconRefresh } from '../components/Icons';
+import { IconExplainability } from '../components/Icons';
+import RefreshButton from '../components/RefreshButton';
 
 export default function Explainability() {
-  const [globalShap, setGlobalShap] = useState([]);
-  const [localShap, setLocalShap] = useState([]);
-  const [summaryData, setSummaryData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pagination for local attributions
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
-  const [totalLocalRecords, setTotalLocalRecords] = useState(0);
-  const [traceFilter, setTraceFilter] = useState('');
 
-  const fetchExplainabilityData = useCallback(async () => {
-    setLoading(true);
+  const [globalShap, setGlobalShap] = useState(() => getCachedData('/explainability/global')?.data || []);
+  const [localShap, setLocalShap] = useState(() => getCachedData('/explainability/local', { limit: 15, offset: 0 })?.data || []);
+  const [summaryData, setSummaryData] = useState(() => getCachedData('/explainability/summary'));
+  const [totalLocalRecords, setTotalLocalRecords] = useState(() => getCachedData('/explainability/local', { limit: 15, offset: 0 })?.total || 0);
+  const [loading, setLoading] = useState(() => !globalShap.length && !summaryData);
+  const [error, setError] = useState(null);
+
+  const fetchExplainabilityData = useCallback(async (force = false) => {
+    if (!globalShap.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const params = {
         limit: pageSize,
         offset: page * pageSize,
       };
-      if (traceFilter) params.trace_id = traceFilter;
 
       const [globalRes, localRes, summaryRes] = await Promise.all([
-        getExplainabilityGlobal(),
-        getExplainabilityLocal(params),
-        getExplainabilitySummary().catch(() => null),
+        getExplainabilityGlobal({ forceRefresh: force }),
+        getExplainabilityLocal(params, { forceRefresh: force }),
+        getExplainabilitySummary({ forceRefresh: force }).catch(() => null),
       ]);
 
       setGlobalShap(globalRes.data || []);
@@ -49,7 +50,7 @@ export default function Explainability() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, traceFilter]);
+  }, [page, pageSize, globalShap.length]);
 
   useEffect(() => {
     fetchExplainabilityData();
@@ -61,7 +62,7 @@ export default function Explainability() {
   const globalChartData = globalShap.map((item) => ({
     label: item.feature_name || item.feature || 'Feature',
     value: Number(item.mean_absolute_shap || item.importance || 0),
-    color: '#06b6d4',
+    color: '#d97706',
   }));
 
   const localColumns = [
@@ -102,7 +103,7 @@ export default function Explainability() {
     {
       key: 'direction',
       label: 'Impact Direction',
-      width: '200px',
+      width: '240px',
       render: (_, row) => {
         const num = Number(row.shap_value) || 0;
         return num >= 0 ? (
@@ -124,28 +125,11 @@ export default function Explainability() {
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h2 className="page-title">SHAP Feature Attribution & Explainability (XAI)</h2>
-          <p className="page-desc">
-            Game-theoretic Shapley Additive Explanations quantifying feature contributions to GRU congestion predictions.
-          </p>
+          <h2 className="page-title">SHAP Feature Attribution & Explainability</h2>
         </div>
 
         <div className="header-actions">
-          <input
-            type="text"
-            placeholder="Filter by Trace ID (e.g. TRC-000001)..."
-            value={traceFilter}
-            onChange={(e) => {
-              setTraceFilter(e.target.value);
-              setPage(0);
-            }}
-            className="search-input"
-          />
-
-          <button onClick={fetchExplainabilityData} className="btn btn-secondary">
-            <IconRefresh size={14} />
-            <span>Refresh</span>
-          </button>
+          <RefreshButton onRefresh={fetchExplainabilityData} />
         </div>
       </div>
 
@@ -163,7 +147,7 @@ export default function Explainability() {
           value={summary.feature_count || globalShap.length || 11}
           subtext="Evaluated input dimensions"
           icon={IconExplainability}
-          accent="cyan"
+          accent="amber"
         />
         <StatCard
           title="Additivity Validation"
@@ -177,7 +161,7 @@ export default function Explainability() {
           value={globalShap[0]?.feature_name || 'cluster_id'}
           subtext={`Mean |SHAP|: ${globalShap[0]?.mean_absolute_shap ? Number(globalShap[0].mean_absolute_shap).toFixed(5) : '0.00691'}`}
           icon={IconExplainability}
-          accent="blue"
+          accent="coral"
         />
       </div>
 
@@ -186,7 +170,7 @@ export default function Explainability() {
         <BarChart
           title="Population-Level Global Feature Importance (Mean |SHAP|)"
           data={globalChartData}
-          barColor="#06b6d4"
+          barColor="#d97706"
           height={320}
           unit="SHAP"
           maxBars={11}

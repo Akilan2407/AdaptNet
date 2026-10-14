@@ -1,28 +1,30 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getCongestionPredictions, getCongestionSummary } from '../services/api';
+import { getCongestionPredictions, getCongestionSummary, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import StatusBadge from '../components/StatusBadge';
 import { LineChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconCongestion, IconRefresh } from '../components/Icons';
+import { IconCongestion } from '../components/Icons';
 import { formatTimestamp } from '../utils/formatters';
 
 export default function Congestion() {
-  const [predictions, setPredictions] = useState([]);
-  const [summaryData, setSummaryData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pagination
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [deviceFilter, setDeviceFilter] = useState('');
 
-  const fetchCongestionData = useCallback(async () => {
-    setLoading(true);
+  const [predictions, setPredictions] = useState(() => getCachedData('/congestion/predictions', { limit: 15, offset: 0 })?.data || []);
+  const [summaryData, setSummaryData] = useState(() => getCachedData('/congestion/summary'));
+  const [totalRecords, setTotalRecords] = useState(() => getCachedData('/congestion/predictions', { limit: 15, offset: 0 })?.total || 0);
+  const [loading, setLoading] = useState(() => !predictions.length && !summaryData);
+  const [error, setError] = useState(null);
+
+  const fetchCongestionData = useCallback(async (force = false) => {
+    if (!predictions.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const params = {
@@ -32,8 +34,8 @@ export default function Congestion() {
       if (deviceFilter) params.device_id = deviceFilter;
 
       const [predRes, summaryRes] = await Promise.all([
-        getCongestionPredictions(params),
-        getCongestionSummary().catch(() => null),
+        getCongestionPredictions(params, { forceRefresh: force }),
+        getCongestionSummary({ forceRefresh: force }).catch(() => null),
       ]);
 
       setPredictions(predRes.data || []);
@@ -44,7 +46,7 @@ export default function Congestion() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, deviceFilter]);
+  }, [page, pageSize, deviceFilter, predictions.length]);
 
   useEffect(() => {
     fetchCongestionData();
@@ -114,9 +116,6 @@ export default function Congestion() {
       <div className="page-header">
         <div>
           <h2 className="page-title">Congestion Forecast & Model Evaluation</h2>
-          <p className="page-desc">
-            Recurrent GRU neural network forecasting future link saturation and queue build-up.
-          </p>
         </div>
 
         <div className="header-actions">
@@ -136,10 +135,7 @@ export default function Congestion() {
             <option value="h5">Host h5</option>
           </select>
 
-          <button onClick={fetchCongestionData} className="btn btn-secondary">
-            <IconRefresh size={14} />
-            <span>Refresh</span>
-          </button>
+          <RefreshButton onRefresh={fetchCongestionData} />
         </div>
       </div>
 
@@ -157,14 +153,14 @@ export default function Congestion() {
           value={modelEval.rmse !== undefined ? Number(modelEval.rmse).toFixed(4) : '0.1852'}
           subtext="Root mean squared error"
           icon={IconCongestion}
-          accent="blue"
+          accent="coral"
         />
         <StatCard
           title="Input Sequence Window"
           value={`${metadata.timesteps || 2} steps`}
           subtext={`${metadata.features_per_step || 11} telemetry features`}
           icon={IconCongestion}
-          accent="cyan"
+          accent="amber"
         />
         <StatCard
           title="Predictor Architecture"
@@ -181,8 +177,8 @@ export default function Congestion() {
           title="GRU Forecast vs Ground-Truth Congestion Score"
           data={chartData}
           series={[
-            { key: 'actual_score', name: 'Actual Ground Truth', color: '#10b981' },
-            { key: 'predicted_score', name: 'GRU Predicted', color: '#06b6d4' },
+            { key: 'actual_score', name: 'Actual Ground Truth', color: '#059669' },
+            { key: 'predicted_score', name: 'GRU Predicted', color: '#d97706' },
           ]}
           unit="score"
           height={260}

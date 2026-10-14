@@ -37,3 +37,75 @@
 [2026-09-23 12:07:46] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
 [2026-09-25 09:26:37] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
 [2026-09-25 09:26:37] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-02 17:28:12] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:28:12] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:28:12] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:28:12] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:28:12] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:28:13] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-02 17:28:13] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-02 17:36:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:36:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:36:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:36:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:36:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:36:28] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-02 17:36:28] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-02 17:37:47] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-02 17:37:47] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-02 17:40:05] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:40:05] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:40:05] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:40:05] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:40:05] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 17:40:07] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-02 17:40:07] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-02 21:51:25] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 21:51:25] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 21:51:25] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 21:51:25] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 21:51:25] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-02 21:51:27] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-02 21:51:27] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-07 10:13:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-07 10:13:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-07 10:13:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-07 10:13:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-07 10:13:27] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-07 10:13:28] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-07 10:13:28] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-10 15:27:36] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 15:27:36] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 15:27:36] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 15:27:36] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 15:27:36] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 15:27:37] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-10 15:27:37] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-10 17:12:57] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 17:12:57] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 17:12:57] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 17:12:57] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 17:12:57] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-10 17:12:59] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-10 17:12:59] REJECTED (Invalid source port 999999 (must be 1-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-11 07:54:53] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-11 07:54:53] REJECTED (Invalid source port 999999 (must be 0-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-11 07:55:42] REJECTED (Invalid field count: expected 11 fields, found 5): this|is|a|bad|line
+[2026-10-11 07:55:42] REJECTED (Invalid source port 999999 (must be 0-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-11 07:58:11] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 07:58:11] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 07:58:11] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 07:58:11] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 07:58:11] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 07:58:13] REJECTED (Invalid field count: expected 11 or 16 fields, found 5): this|is|a|bad|line
+[2026-10-11 07:58:13] REJECTED (Invalid source port 999999 (must be 0-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-11 08:00:55] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 08:00:55] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 08:00:55] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 08:00:55] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 08:00:55] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-11 08:00:56] REJECTED (Invalid field count: expected 11 or 16 fields, found 5): this|is|a|bad|line
+[2026-10-11 08:00:56] REJECTED (Invalid source port 999999 (must be 0-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1
+[2026-10-13 09:21:34] REJECTED (Duplicate record detected (already in recent buffer)): DUPLICATE
+[2026-10-13 09:21:35] REJECTED (Invalid field count: expected 11 or 16 fields, found 5): this|is|a|bad|line
+[2026-10-13 09:21:35] REJECTED (Invalid source port 999999 (must be 0-65535)): 2026-09-12 15:20:01|h1|10.0.0.1|10.0.0.2|999999|5201|INVALID_PROTO|12.45|N/A|N/A|1

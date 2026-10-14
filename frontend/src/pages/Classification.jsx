@@ -1,28 +1,30 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getClassificationFlows, getClassificationSummary } from '../services/api';
+import { getClassificationFlows, getClassificationSummary, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import StatusBadge from '../components/StatusBadge';
 import { DonutChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
-import { IconClassification, IconRefresh } from '../components/Icons';
+import { IconClassification } from '../components/Icons';
 import { formatPercent, formatTimestamp } from '../utils/formatters';
 
 export default function Classification() {
-  const [flows, setFlows] = useState([]);
-  const [summaryData, setSummaryData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pagination & Filtering
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [classFilter, setClassFilter] = useState('');
 
-  const fetchClassificationData = useCallback(async () => {
-    setLoading(true);
+  const [flows, setFlows] = useState(() => getCachedData('/classification/flows', { limit: 15, offset: 0 })?.data || []);
+  const [summaryData, setSummaryData] = useState(() => getCachedData('/classification/summary'));
+  const [totalRecords, setTotalRecords] = useState(() => getCachedData('/classification/flows', { limit: 15, offset: 0 })?.total || 0);
+  const [loading, setLoading] = useState(() => !flows.length && !summaryData);
+  const [error, setError] = useState(null);
+
+  const fetchClassificationData = useCallback(async (force = false) => {
+    if (!flows.length || force) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const params = {
@@ -32,8 +34,8 @@ export default function Classification() {
       if (classFilter) params.traffic_class = classFilter;
 
       const [flowsRes, summaryRes] = await Promise.all([
-        getClassificationFlows(params),
-        getClassificationSummary().catch(() => null),
+        getClassificationFlows(params, { forceRefresh: force }),
+        getClassificationSummary({ forceRefresh: force }).catch(() => null),
       ]);
 
       setFlows(flowsRes.data || []);
@@ -44,7 +46,7 @@ export default function Classification() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, classFilter]);
+  }, [page, pageSize, classFilter, flows.length]);
 
   useEffect(() => {
     fetchClassificationData();
@@ -55,18 +57,18 @@ export default function Classification() {
   const classDist = summary.traffic_class_distribution || {};
 
   const donutColors = {
-    BULK_TRANSFER: '#3b82f6',
-    VIDEO_STREAMING: '#8b5cf6',
-    VOIP: '#f43f5e',
-    WEB_BROWSING: '#06b6d4',
-    DNS: '#10b981',
-    SSH: '#f59e0b',
+    BULK_TRANSFER: '#d97706',
+    VIDEO_STREAMING: '#7c3aed',
+    VOIP: '#e11d48',
+    WEB_BROWSING: '#ea580c',
+    DNS: '#059669',
+    SSH: '#b45309',
   };
 
   const chartData = Object.entries(classDist).map(([cls, count]) => ({
     label: cls,
     value: Number(count),
-    color: donutColors[cls] || '#6b7280',
+    color: donutColors[cls] || '#78716c',
   }));
 
   const columns = [
@@ -120,9 +122,6 @@ export default function Classification() {
       <div className="page-header">
         <div>
           <h2 className="page-title">Network Traffic Classification</h2>
-          <p className="page-desc">
-            Payload-free, metadata-based network flow categorization into application traffic classes.
-          </p>
         </div>
 
         <div className="header-actions">
@@ -143,10 +142,7 @@ export default function Classification() {
             <option value="DNS">DNS</option>
           </select>
 
-          <button onClick={fetchClassificationData} className="btn btn-secondary">
-            <IconRefresh size={14} />
-            <span>Refresh</span>
-          </button>
+          <RefreshButton onRefresh={fetchClassificationData} />
         </div>
       </div>
 
@@ -156,14 +152,14 @@ export default function Classification() {
           title="Total Classified Flows"
           value={summary.total_flows || totalRecords}
           icon={IconClassification}
-          accent="cyan"
+          accent="amber"
         />
         <StatCard
           title="Distinct Categories"
           value={Object.keys(classDist).length || 5}
           unit="classes"
           icon={IconClassification}
-          accent="blue"
+          accent="coral"
         />
         <StatCard
           title="Classification Coverage"
@@ -186,7 +182,7 @@ export default function Classification() {
         <div className="grid-col">
           <DonutChart
             title="Application Class Distribution"
-            data={chartData.length > 0 ? chartData : [{ label: 'BULK_TRANSFER', value: 53, color: '#3b82f6' }]}
+            data={chartData.length > 0 ? chartData : [{ label: 'BULK_TRANSFER', value: 53, color: '#d97706' }]}
             centerText={String(totalRecords)}
             centerSubtext="Flows"
           />

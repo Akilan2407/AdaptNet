@@ -8,8 +8,8 @@ export function BarChart({
   title = '',
   unit = '',
   maxBars = 10,
-  barColor = '#06b6d4',
-  height = 260,
+  barColor = '#d97706',
+  height = null,
 }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
@@ -23,7 +23,7 @@ export function BarChart({
   return (
     <div className="chart-card">
       {title && <h4 className="chart-title">{title}</h4>}
-      <div className="bar-chart-container" style={{ minHeight: `${height}px` }}>
+      <div className="bar-chart-container" style={height ? { minHeight: `${height}px` } : undefined}>
         {displayData.map((item, idx) => {
           const val = Number(item.value) || 0;
           const pct = Math.min(100, Math.max(2, (val / maxVal) * 100));
@@ -70,8 +70,8 @@ export function BarChart({
 export function LineChart({
   data = [],
   series = [
-    { key: 'actual_score', name: 'Actual Score', color: '#10b981' },
-    { key: 'predicted_score', name: 'Predicted Score', color: '#06b6d4' },
+    { key: 'actual_score', name: 'Actual Score', color: '#059669' },
+    { key: 'predicted_score', name: 'Predicted Score', color: '#d97706' },
   ],
   title = '',
   height = 240,
@@ -139,8 +139,8 @@ export function LineChart({
             const yPos = getY(yVal);
             return (
               <g key={idx} className="grid-group">
-                <line x1={padding.left} y1={yPos} x2={width - padding.right} y2={yPos} stroke="#1f2937" strokeDasharray="3 3" />
-                <text x={padding.left - 8} y={yPos + 4} textAnchor="end" fill="#6b7280" fontSize="10">
+                <line x1={padding.left} y1={yPos} x2={width - padding.right} y2={yPos} stroke="rgba(217, 185, 150, 0.28)" strokeDasharray="3 3" />
+                <text x={padding.left - 8} y={yPos + 4} textAnchor="end" fill="#78716c" fontSize="10">
                   {yVal.toFixed(2)}
                 </text>
               </g>
@@ -173,7 +173,7 @@ export function LineChart({
                   cx={x}
                   cy={y}
                   r="3.5"
-                  fill="#0b0f19"
+                  fill="#faf6f0"
                   stroke={s.color}
                   strokeWidth="2"
                   className="chart-dot"
@@ -239,7 +239,7 @@ export function DonutChart({
               cy={center}
               r={radius}
               fill="transparent"
-              stroke="#1f2937"
+              stroke="rgba(217, 185, 150, 0.25)"
               strokeWidth={strokeWidth}
             />
 
@@ -258,7 +258,7 @@ export function DonutChart({
                   cy={center}
                   r={radius}
                   fill="transparent"
-                  stroke={slice.color || '#3b82f6'}
+                  stroke={slice.color || '#d97706'}
                   strokeWidth={isHovered ? strokeWidth + 4 : strokeWidth}
                   strokeDasharray={strokeDasharray}
                   strokeDashoffset={strokeDashoffset}
@@ -272,10 +272,10 @@ export function DonutChart({
             })}
 
             {/* Center Label */}
-            <text x={center} y={center - 4} textAnchor="middle" fill="#f9fafb" fontSize="16" fontWeight="bold">
+            <text x={center} y={center - 4} textAnchor="middle" fill="#1c1917" fontSize="16" fontWeight="bold">
               {hoveredIdx !== null ? data[hoveredIdx].value : centerText || total}
             </text>
-            <text x={center} y={center + 14} textAnchor="middle" fill="#9ca3af" fontSize="10">
+            <text x={center} y={center + 14} textAnchor="middle" fill="#78716c" fontSize="10">
               {hoveredIdx !== null ? data[hoveredIdx].label : centerSubtext || 'Total'}
             </text>
           </svg>
@@ -293,7 +293,7 @@ export function DonutChart({
                 onMouseLeave={() => setHoveredIdx(null)}
               >
                 <div className="donut-legend-info">
-                  <span className="legend-dot" style={{ backgroundColor: item.color || '#3b82f6' }}></span>
+                  <span className="legend-dot" style={{ backgroundColor: item.color || '#d97706' }}></span>
                   <span className="legend-label">{item.label}</span>
                 </div>
                 <div className="donut-legend-val">
@@ -311,7 +311,7 @@ export function DonutChart({
 /**
  * Linear Progress Meter with Thresholds.
  */
-export function ProgressMeter({ label, value, max = 100, unit = '%', color = '#06b6d4' }) {
+export function ProgressMeter({ label, value, max = 100, unit = '%', color = '#d97706' }) {
   const pct = Math.min(100, Math.max(0, (value / max) * 100));
   return (
     <div className="progress-meter">

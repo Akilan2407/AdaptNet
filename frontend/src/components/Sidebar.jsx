@@ -12,6 +12,70 @@ import {
   IconExplainability,
   IconExplanations,
 } from './Icons';
+import {
+  getMonitoringFlows,
+  getMonitoringSummary,
+  getProfilingBehaviors,
+  getProfilingClusters,
+  getClassificationFlows,
+  getClassificationSummary,
+  getCongestionPredictions,
+  getCongestionSummary,
+  getPolicyDecisions,
+  getPolicySummary,
+  getControlActions,
+  getControlSummary,
+  getTraces,
+  getTraceSummary,
+  getExplainabilityLocal,
+  getExplainabilityGlobal,
+  getExplanations,
+  getExplanationSummary,
+} from '../services/api';
+
+const prefetchMap = {
+  '/': () => {
+    getMonitoringSummary();
+    getCongestionSummary();
+    getPolicySummary();
+  },
+  '/monitoring': () => {
+    getMonitoringFlows({ limit: 15, offset: 0 });
+    getMonitoringSummary();
+  },
+  '/profiling': () => {
+    getProfilingBehaviors();
+    getProfilingClusters();
+  },
+  '/classification': () => {
+    getClassificationFlows({ limit: 15, offset: 0 });
+    getClassificationSummary();
+  },
+  '/congestion': () => {
+    getCongestionPredictions({ limit: 15, offset: 0 });
+    getCongestionSummary();
+  },
+  '/policies': () => {
+    getPolicyDecisions({ limit: 15, offset: 0 });
+    getPolicySummary();
+  },
+  '/control': () => {
+    getControlActions({ limit: 15, offset: 0 });
+    getControlSummary();
+  },
+  '/traces': () => {
+    getTraces({ limit: 15, offset: 0 });
+    getTraceSummary();
+  },
+  '/explainability': () => {
+    getExplainabilityLocal({ limit: 15, offset: 0 });
+    getExplainabilityGlobal();
+  },
+  '/explanations': () => {
+    getExplanations({ limit: 15, offset: 0 });
+    getExplanationSummary();
+  },
+};
 
 const navItems = [
   { path: '/', label: 'Overview', icon: IconDashboard, section: 'Core' },
@@ -27,9 +91,17 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const handlePrefetch = (path) => {
+    const fn = prefetchMap[path];
+    if (fn) {
+      try {
+        fn();
+      } catch (_) {}
+    }
+  };
+
   return (
     <aside className="app-sidebar">
-      <div className="sidebar-section-title">NAVIGATION</div>
       <nav className="sidebar-nav">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -39,6 +111,8 @@ export default function Sidebar() {
               to={item.path}
               end={item.path === '/'}
               className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}
+              onMouseEnter={() => handlePrefetch(item.path)}
+              onFocus={() => handlePrefetch(item.path)}
             >
               <div className="nav-icon-wrap">
                 <Icon size={16} />
@@ -48,15 +122,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-
-      <div className="sidebar-footer">
-        <div className="sidebar-info-box">
-          <div className="info-box-title">System Architecture</div>
-          <p className="info-box-desc">
-            C Monitoring &rarr; ML GRU &rarr; QoS Policy &rarr; Linux tc &rarr; SHAP XAI
-          </p>
-        </div>
-      </div>
     </aside>
   );
 }
