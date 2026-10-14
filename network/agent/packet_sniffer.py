@@ -459,10 +459,18 @@ def _scapy_available() -> bool:
 class ScapySniffer:
     """Wraps scapy's sniff() to provide CapturedPacket objects."""
 
-    def __init__(self, iface: Optional[str], bpf_filter: str = "", callback: Optional[Callable] = None):
+    def __init__(
+        self,
+        iface: Optional[str],
+        bpf_filter: str = "",
+        callback: Optional[Callable] = None,
+        error_callback: Optional[Callable[[str], None]] = None,
+    ):
         self.iface = iface
         self.bpf_filter = bpf_filter
         self.callback = callback
+        self.error_callback = error_callback
+        self.error: Optional[str] = None
         self._stop_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
 
@@ -562,13 +570,21 @@ class ScapySniffer:
         from scapy.all import sniff as scapy_sniff
 
         def _sniff_loop():
-            scapy_sniff(
-                iface=self.iface,
-                filter=self.bpf_filter,
-                prn=self._on_scapy_packet,
-                store=False,
-                stop_filter=lambda _: self._stop_event.is_set(),
-            )
+            try:
+                scapy_sniff(
+                    iface=self.iface,
+                    filter=self.bpf_filter,
+                    prn=self._on_scapy_packet,
+                    store=False,
+                    stop_filter=lambda _: self._stop_event.is_set(),
+                )
+            except Exception as e:
+                err_msg = str(e)
+                if "winpcap is not installed" in err_msg.lower():
+                    err_msg = "Npcap driver is not installed on Windows. Please install Npcap (https://npcap.com) with WinPcap-compatible mode or run terminal as Administrator."
+                self.error = err_msg
+                if self.error_callback:
+                    self.error_callback(err_msg)
 
         self._thread = threading.Thread(target=_sniff_loop, daemon=True)
         self._thread.start()
@@ -589,7 +605,7 @@ class PacketSniffer:
 
     Priority order:
       1. AF_PACKET raw socket (Linux, root)
-      2. Scapy sniff() (cross-platform, root)
+      2. Scapy sniff() (cross-platform, root/Npcap)
       3. AF_INET raw TCP socket (macOS, root)
 
     Usage:
@@ -604,11 +620,13 @@ class PacketSniffer:
         iface: Optional[str] = None,
         bpf_filter: str = "",
         callback: Optional[Callable[[CapturedPacket], None]] = None,
+        error_callback: Optional[Callable[[str], None]] = None,
         max_buffer: int = 10000,
     ):
         self.iface = iface
         self.bpf_filter = bpf_filter
         self.callback = callback
+        self.error_callback = error_callback
         self.max_buffer = max_buffer
 
         self._packet_buffer: deque = deque(maxlen=max_buffer)
@@ -631,7 +649,27 @@ class PacketSniffer:
     def _detect_mode(self) -> str:
         """Detect best available capture method."""
         if _scapy_available():
+            if platform.system() == "Windows":
+                try:
+                    from scapy.all import conf
+                    import ctypes
+                    is_admin = bool(hasattr(ctypes, "windll") and ctypes.windll.shell32.IsUserAnAdmin())
+                    if not conf.use_pcap and not is_admin:
+                        return "no_capture (Npcap is not installed on Windows. Please install Npcap from https://npcap.com with WinPcap-compatible mode or run terminal as Administrator)"
+                except Exception:
+                    pass
             return "scapy"
+
+        sock, has_eth, desc = create_capture_socket()
+        if sock is not None:
+            self._raw_sock = sock
+            self._has_eth = has_eth
+            if has_eth:
+                return "raw_eth"
+            else:
+                return "raw_ip"
+
+        return "none"
 
         sock, has_eth, desc = create_capture_socket()
         if sock is not None:
@@ -693,6 +731,7 @@ class PacketSniffer:
                 iface=self.iface,
                 bpf_filter=self.bpf_filter,
                 callback=self._dispatch,
+                error_callback=self.error_callback,
             )
             self._scapy_sniffer.start()
             return f"scapy (iface={self.iface or 'any'}, filter='{self.bpf_filter}')"
@@ -704,7 +743,7 @@ class PacketSniffer:
             return f"{label} (iface={self.iface or 'any'})"
 
         else:
-            return "no_capture (insufficient privileges — run as root/sudo)"
+            return mode if mode.startswith("no_capture") else "no_capture (insufficient privileges — run as root/sudo)"
 
     def stop(self) -> None:
         """Stop packet capture cleanly."""

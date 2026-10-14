@@ -131,7 +131,11 @@ class LiveCaptureService:
             else:
                 self._other_count += 1
 
-            self._recent_timestamps.append(now)
+    def _on_sniffer_error(self, err_msg: str) -> None:
+        """Handle async errors from background capture threads."""
+        with self._lock:
+            self._status = "ERROR"
+            self._error_message = err_msg
 
     # ── Lifecycle Controls ───────────────────────────────────────────────────
 
@@ -150,6 +154,7 @@ class LiveCaptureService:
                 iface=interface if interface and interface != "default" else None,
                 bpf_filter=bpf_filter,
                 callback=self._on_packet_arrived,
+                error_callback=self._on_sniffer_error,
                 max_buffer=self.max_buffer,
             )
             mode_desc = sniffer.start()
