@@ -3,7 +3,7 @@ import { getMonitoringFlows, getMonitoringSummary, getCachedData } from '../serv
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import RefreshButton from '../components/RefreshButton';
-import LoadingState from '../components/LoadingState';
+import DataSourceToggle from '../components/DataSourceToggle';
 import ErrorState from '../components/ErrorState';
 import { IconMonitoring } from '../components/Icons';
 import { formatMbps, formatPercent, formatTimestamp } from '../utils/formatters';
@@ -132,46 +132,13 @@ export default function Monitoring() {
 
         <div className="header-actions">
           {/* Data Source Toggle */}
-          <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.05)', borderRadius: '10px', padding: '3px' }}>
-            <button
-              onClick={() => {
-                setDataSource('historical');
-                setPage(0);
-              }}
-              style={{
-                padding: '5px 12px',
-                borderRadius: '8px',
-                border: 'none',
-                background: dataSource === 'historical' ? 'white' : 'transparent',
-                color: dataSource === 'historical' ? '#1c1917' : '#78716c',
-                fontWeight: 600,
-                fontSize: '12px',
-                cursor: 'pointer',
-                boxShadow: dataSource === 'historical' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              }}
-            >
-              📁 Historical
-            </button>
-            <button
-              onClick={() => {
-                setDataSource('live');
-                setPage(0);
-              }}
-              style={{
-                padding: '5px 12px',
-                borderRadius: '8px',
-                border: 'none',
-                background: dataSource === 'live' ? '#10b981' : 'transparent',
-                color: dataSource === 'live' ? 'white' : '#78716c',
-                fontWeight: 600,
-                fontSize: '12px',
-                cursor: 'pointer',
-                boxShadow: dataSource === 'live' ? '0 1px 3px rgba(16,185,129,0.3)' : 'none',
-              }}
-            >
-              ⚡ Live Wire
-            </button>
-          </div>
+          <DataSourceToggle
+            value={dataSource}
+            onChange={(src) => {
+              setDataSource(src);
+              setPage(0);
+            }}
+          />
 
           {/* Device Filter Dropdown */}
           <select

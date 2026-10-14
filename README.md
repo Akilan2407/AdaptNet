@@ -1,6 +1,6 @@
 # AdaptNet: Explainable, User-Aware ML System for Adaptive Network Traffic Management
 
-An end-to-end intelligent network traffic management system combining low-level C telemetry collection, Python-powered machine learning (behavior profiling, GRU congestion forecasting, rule-based QoS policy engines, and SHAP explainability), a Flask REST API service, and a modern React Vite admin dashboard.
+An end-to-end intelligent network traffic management system combining low-level packet capture, real-time streaming machine learning (device profiling, pure-NumPy GRU congestion forecasting, rule-based QoS policy engines, and SHAP explainability), a Flask REST API service, and a modern React Vite admin dashboard.
 
 ---
 
@@ -9,11 +9,16 @@ An end-to-end intelligent network traffic management system combining low-level 
 ```
 adaptive-network-traffic-management/
 ├── network/                    # Low-level networking & IPC in C / Python
-│   ├── agent/                  # C telemetry monitoring agent (packet dissection, timing)
+│   ├── agent/                  # Packet sniffer agent (Scapy / raw socket stream monitor)
 │   ├── controller/             # C network controller & telemetry hub
 │   ├── common/                 # Protocol headers (protocol.h, packet definitions)
 │   └── traffic/                # Synthetic traffic generation & topology emulation
 ├── ml/                         # Machine Learning pipeline
+│   ├── realtime/               # ⚡ Real-time wire capture & multi-model streaming pipeline
+│   │   ├── packet_normalizer.py# Packet header normalization & protocol extraction
+│   │   ├── flow_aggregator.py  # Stateful 5-tuple flow tracking & rate computation
+│   │   ├── model_runner.py     # Multi-model inference (K-Means, Pure-NumPy GRU, Rules, QoS, SHAP)
+│   │   └── pipeline_manager.py # Thread-safe singleton coordinator & ring buffers
 │   ├── features/               # Feature extraction from raw network flows
 │   ├── profiling/              # User/device clustering (K-Means, DBSCAN)
 │   ├── classification/         # Rule-based & ML traffic classification
@@ -24,8 +29,8 @@ adaptive-network-traffic-management/
 │   ├── explainability/         # Model transparency & feature attributions (SHAP)
 │   └── explanation/            # Natural language explanation generator
 ├── backend/                    # Flask REST API service layer
-│   ├── routes/                 # Blueprint endpoints (health, monitoring, profiling, etc.)
-│   ├── services/               # Data loaders, CSV parsers, and cache managers
+│   ├── routes/                 # Blueprint endpoints (health, live capture, monitoring, profiling, etc.)
+│   ├── services/               # Data loaders, LiveCaptureService, and pipeline managers
 │   ├── tests/                  # REST API test suite (44 automated tests)
 │   └── app.py                  # API entry point & CORS configuration
 ├── frontend/                   # Modern React + Vite web dashboard
@@ -39,26 +44,25 @@ adaptive-network-traffic-management/
 │   ├── policies/               # Policy allocations & decision matrices
 │   ├── traces/                 # Structured decision trace logs
 │   └── explainability/         # SHAP local/global attributions & summary JSONs
-├── tests/                      # Integration & unit test suites (backend, ml, network)
+├── tests/                      # Integration & unit test suites (backend, ml, network, realtime)
 ├── docs/                       # Architecture diagrams & technical documentation
 ├── start_system.ps1            # Windows PowerShell one-click launcher
 ├── start_system.sh             # Linux/macOS Bash one-click launcher
 ├── COMMANDS.md                 # Full command and operational reference guide
 ├── Makefile                    # C build system for monitoring agent & controller
 ├── CMakeLists.txt              # CMake build configuration
-├── requirements.txt            # Python dependencies (Flask, scikit-learn, Scapy, etc.)
+├── requirements.txt            # Python dependencies (Flask, scikit-learn, Scapy, h5py, etc.)
 └── README.md                   # Project overview & quick start
 ```
 
 ### Technology Matrix
-- **Telemetry Collection & Sniffing**: `C` (C11, POSIX sockets, pthread, pcap) / `Python` (`scapy`, `psutil`)
-- **Agent ↔ Controller IPC**: `TCP` (`protocol.h` fixed-format binary frames)
-- **Data Processing**: `NumPy`, `Pandas`, `SciPy`
-- **User / Device Profiling**: `scikit-learn` (`K-Means`, `DBSCAN`)
-- **Congestion Forecasting**: `TensorFlow` / `Keras` (GRU recurrent neural networks)
-- **Explainability (XAI)**: `SHAP` (Shapley Additive exPlanations) & Natural Language Reason Chains
+- **Telemetry Collection & Sniffing**: `Python` (`scapy`, raw socket monitor, `psutil`) / `C` (C11, POSIX sockets, pthread, pcap)
+- **Real-Time Streaming Engine**: Zero-copy packet normalization, stateful 5-tuple flow aggregation, EWMA rate estimator
+- **User / Device Profiling**: `scikit-learn` (`K-Means`, `DBSCAN`) with standard feature scaling
+- **Congestion Forecasting**: Recurrent neural networks (GRU) with a pure-NumPy zero-TensorFlow forward-pass runner (ensuring seamless Python 3.13 / Windows cross-platform support)
+- **Explainability (XAI)**: `SHAP` (Shapley Additive exPlanations) & dynamic local feature attributions
 - **Backend REST API**: `Flask` 3.x, `Flask-CORS` (listening on port `5001`)
-- **Frontend Dashboard**: `React` 18, `Vite`, Tailwind CSS / Lucide icons (listening on port `3000`)
+- **Frontend Dashboard**: `React` 18, `Vite`, Lucide icons, glassmorphic dark theme (listening on port `3000`)
 - **Testing & Emulation**: `pytest`, `Mininet`, `iperf3`
 
 ---
@@ -66,7 +70,7 @@ adaptive-network-traffic-management/
 ## ⚡ Quick Start
 
 ### 1. Prerequisites
-- **Python**: `Python 3.10+` (tested with Python 3.13 / 3.14)
+- **Python**: `Python 3.10+` (fully tested with Python 3.13 on Windows & Linux)
 - **Node.js**: `Node v18+` and `npm`
 - **C Compiler** *(Optional for C binaries on Linux/macOS)*: `gcc` or `clang` with `make`
 
@@ -105,107 +109,75 @@ The unified launcher checks port availability, starts the Flask REST API on port
 | :--- | :---: | :--- |
 | `/api/health` | `GET` | Health status and module availability |
 | `/api/stats` | `GET` | Aggregated system metrics (flow counts, alert levels) |
-| `/api/monitoring/flows` | `GET` | Live and recorded network flow records |
+| `/api/live/interfaces` | `GET` | List available OS network interfaces |
+| `/api/live/start` | `POST` | Start real-time packet capture and ML pipeline |
+| `/api/live/stop` | `POST` | Stop real-time packet capture |
+| `/api/live/stats` | `GET` | Raw sniffer metrics, arrival rate (pps), and protocol breakdown |
+| `/api/live/packets` | `GET` | Recent captured raw packet frames |
+| `/api/live/pipeline/status` | `GET` | Status of real-time ML engine, queue size, and inference count |
+| `/api/live/pipeline/flows` | `GET` | Stateful 5-tuple flows with live ML predictions |
+| `/api/live/pipeline/predictions`| `GET` | Recent ML predictions (traffic class, cluster, congestion score, priority) |
+| `/api/live/pipeline/traces` | `GET` | Live 7-stage decision traces with SHAP explainability |
+| `/api/live/pipeline/clear` | `POST` | Reset in-memory flow and trace ring buffers |
+| `/api/monitoring/flows` | `GET` | Network flows (`?source=live` supported) |
 | `/api/monitoring/summary` | `GET` | Summary statistics of monitored network flows |
-| `/api/monitoring/search` | `GET` | Filtered flow queries by IP, port, or protocol |
 | `/api/profiling/behaviors` | `GET` | Device behavior profiles and cluster assignments |
-| `/api/profiling/clusters` | `GET` | Summary of identified behavioral clusters |
-| `/api/congestion/predictions` | `GET` | GRU congestion forecasts and risk probabilities |
-| `/api/congestion/summary` | `GET` | Aggregate congestion risk indices across devices |
-| `/api/classification/flows` | `GET` | Flow classification (Web, Streaming, Interactive, etc.) |
-| `/api/policy/decisions` | `GET` | QoS bandwidth limits and priority allocations |
-| `/api/policy/summary` | `GET` | QoS policy overview and rule breakdown |
-| `/api/control/actions` | `GET` | Traffic shaping and queue configuration actions |
-| `/api/control/state` | `GET` | Current operational state of traffic controller |
-| `/api/traces` | `GET` | End-to-end decision traces linking telemetry to QoS |
-| `/api/traces/<trace_id>` | `GET` | Detailed audit record for an individual decision trace |
+| `/api/congestion/predictions` | `GET` | GRU congestion forecasts (`?source=live` supported) |
+| `/api/classification/flows` | `GET` | Flow classification results (`?source=live` supported) |
+| `/api/policy/decisions` | `GET` | QoS bandwidth limits and priority allocations (`?source=live` supported) |
+| `/api/traces` | `GET` | End-to-end decision traces linking telemetry to QoS (`?source=live` supported) |
 | `/api/explainability/local` | `GET` | Local SHAP attribution values for specific predictions |
 | `/api/explainability/global`| `GET` | Global SHAP feature importances across all features |
 | `/api/explanations` | `GET` | Natural language explanations for QoS decisions |
 
 ---
 
-## 🛠 Manual Installation & Individual Startup
+## ⚡ Real-Time ML Wire Capture Pipeline
 
-If you prefer to run services in separate terminals for independent debugging:
+AdaptNet features a **zero-delay, live wire machine learning pipeline** that hooks into genuine physical/virtual network interfaces:
 
-### A. Python Environment Setup
-```powershell
-# Windows
-python -m pip install --upgrade pip
-pip install -r requirements.txt
+1. **Packet Normalization:** Raw Ethernet/IP frames are converted into structured `NormalizedPacket` records extracting IP addresses, ports, transport protocol, header flags, payload sizes, and sequence numbers.
+2. **Stateful Flow Aggregation:** Bounded in-memory flow aggregator tracks active 5-tuple sessions (`src:port -> dst:port [proto]`), computing exponentially weighted moving average (EWMA) throughput, RTT, and packet loss metrics with idle-timeout eviction.
+3. **Multi-Model Inference:**
+   - **K-Means Host Profiling:** Dynamically assigns device behavior clusters from live telemetry.
+   - **Traffic Classification:** Categorizes live flows (Web, Video/VoIP, Bulk Transfer, Interactive, DNS) based on port and traffic heuristics.
+   - **Zero-TensorFlow NumPy GRU Forecaster:** Executes recurrent neural network forward passes directly against trained `.keras` weights without needing TensorFlow installed (running in $<5$ ms on Windows and Python 3.13).
+   - **QoS Policy Engine:** Synthesizes traffic class, device profile, and predicted congestion score to compute QoS priority (`CRITICAL`, `HIGH`, `NORMAL`, `LOW`) and bandwidth limits.
+   - **Decision Trace & SHAP:** Emits a 7-stage auditable trace (`TRC-LIVE-xxxxxx`) with live feature attribution breakdown.
 
-# Linux / macOS
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-### B. Frontend Setup
-```bash
-cd frontend
-npm install
-cd ..
-```
-
-### C. Running Services Individually
-
-**Terminal 1 — Flask REST API (Port 5001):**
-```powershell
-# Windows PowerShell
-$env:PORT = "5001"
-python backend/app.py
-
-# Linux / macOS
-PORT=5001 python backend/app.py
-```
-
-**Terminal 2 — React Dashboard (Port 3000):**
-```bash
-cd frontend
-npm run dev
-```
+> [!NOTE]
+> **Kernel QoS Enforcement Disclaimer:**
+> In standard user-space mode, QoS policies are calculated, audited, and presented as **RECOMMENDED POLICIES**. Direct kernel-level traffic shaping requires root/administrative OS privileges and traffic control driver bindings (Linux `tc` / `netem` or Windows QoS Packet Scheduler).
 
 ---
 
 ## 🧪 Testing & Verification
 
-Ensure dependencies are installed and run the automated test suite:
+Run the comprehensive automated test suite (51 tests):
 
 ```bash
-# Run backend REST API test suite (44 tests)
-pytest -v backend/tests/test_api.py
-
-# Run network module unit tests
-pytest -v tests/network/
-
-# Run ML pipeline unit tests
-pytest -v tests/ml/
+# Run all backend API and real-time streaming pipeline tests
+pytest -v backend/tests/test_api.py tests/test_realtime_pipeline.py
 ```
 
-### C Networking System (Linux / macOS only)
-```bash
-# Compile monitoring agent and controller binaries
-make all
-
-# Run smoke tests
-make test
-```
+### Test Coverage Highlights:
+- **`backend/tests/test_api.py` (44 tests):** Health checks, monitoring, profiling, congestion, classification, policies, control state, decision traces, and SHAP explainability.
+- **`tests/test_realtime_pipeline.py` (7 tests):** Packet normalization, stateful flow aggregation, EWMA rate computation, idle flow eviction, multi-model inference runner, pipeline manager worker thread, and live API endpoints.
 
 ---
 
 ## 💻 React Admin Dashboard Modules
 
-The React frontend includes an intuitive dark-themed user interface:
-1. **Network Monitoring**: Real-time traffic throughput, packet rates, RTT, jitter, and active connections.
-2. **User & Device Profiling**: Cluster visualization (K-Means/DBSCAN) distinguishing heavy streamers, bulk downloaders, and interactive users.
-3. **Congestion Forecasting**: Recurrent neural network forecasts indicating upcoming queue saturation and bottleneck probabilities.
-4. **Traffic Classification**: Port and flow classification identifying web browsing, DNS, gaming, VoIP, and bulk data transfers.
-5. **QoS Policy Engine**: Dynamic bandwidth allocation, rate limits, and priority tier assignments.
-6. **Traffic Control**: Kernel traffic control (`tc` HTB) queue status, shaping rules, and actuation state.
-7. **Decision Traces**: Comprehensive audit log mapping inputs, predictions, policies, and actions.
-8. **Explainable AI (XAI)**: Interactive SHAP feature importance charts and clear human-readable explanations explaining *why* traffic was throttled or prioritized.
-9. **Diagnostics & Health**: Live backend subsystem latency, data file freshness, and endpoint telemetry.
+The React frontend includes an intuitive glassmorphic dashboard:
+1. **Live Wire Sniffer & Real-Time ML**: Start/stop live wire packet capture, inspect active 5-tuple flows, view live ML predictions, and audit decision traces in real time.
+2. **Network Monitoring**: Real-time traffic throughput, packet rates, RTT, jitter, and active connections with a toggle between **📁 Historical Dataset** and **⚡ Live Wire Stream**.
+3. **User & Device Profiling**: Cluster visualization (K-Means/DBSCAN) distinguishing heavy streamers, bulk downloaders, and interactive users.
+4. **Congestion Forecasting**: Recurrent neural network forecasts indicating upcoming queue saturation and bottleneck probabilities.
+5. **Traffic Classification**: Port and flow classification identifying web browsing, DNS, gaming, VoIP, and bulk data transfers.
+6. **QoS Policy Engine**: Dynamic bandwidth allocation, rate limits, and priority tier assignments.
+7. **Adaptive Traffic Control**: Topology visualization, queue status, shaping rules, and actuation state.
+8. **Decision Traces**: Comprehensive audit log mapping telemetry inputs, predictions, policies, and actions with interactive lineage inspection modals.
+9. **Explainable AI (SHAP)**: Interactive SHAP feature importance charts and human-readable explanation reason chains.
 
 ---
 

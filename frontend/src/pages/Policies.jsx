@@ -3,6 +3,7 @@ import { getPolicyDecisions, getPolicySummary, getCachedData } from '../services
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import RefreshButton from '../components/RefreshButton';
+import DataSourceToggle from '../components/DataSourceToggle';
 import StatusBadge from '../components/StatusBadge';
 import { DonutChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
@@ -15,6 +16,7 @@ export default function Policies() {
   const [pageSize] = useState(15);
   const [priorityFilter, setPriorityFilter] = useState('');
   const [deviceFilter, setDeviceFilter] = useState('');
+  const [dataSource, setDataSource] = useState('historical'); // 'historical' | 'live'
 
   const [decisions, setDecisions] = useState(() => getCachedData('/policy/decisions', { limit: 15, offset: 0 })?.data || []);
   const [summaryData, setSummaryData] = useState(() => getCachedData('/policy/summary'));
@@ -31,13 +33,14 @@ export default function Policies() {
       const params = {
         limit: pageSize,
         offset: page * pageSize,
+        source: dataSource,
       };
       if (priorityFilter) params.priority = priorityFilter;
       if (deviceFilter) params.device_id = deviceFilter;
 
       const [decRes, summaryRes] = await Promise.all([
         getPolicyDecisions(params, { forceRefresh: force }),
-        getPolicySummary({ forceRefresh: force }).catch(() => null),
+        getPolicySummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
       ]);
 
       setDecisions(decRes.data || []);
@@ -48,7 +51,7 @@ export default function Policies() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, priorityFilter, deviceFilter, decisions.length]);
+  }, [page, pageSize, priorityFilter, deviceFilter, dataSource, decisions.length]);
 
   useEffect(() => {
     fetchPolicyData();
@@ -118,6 +121,14 @@ export default function Policies() {
         </div>
 
         <div className="header-actions">
+          <DataSourceToggle
+            value={dataSource}
+            onChange={(src) => {
+              setDataSource(src);
+              setPage(0);
+            }}
+          />
+
           {/* Priority Filter */}
           <select
             value={priorityFilter}

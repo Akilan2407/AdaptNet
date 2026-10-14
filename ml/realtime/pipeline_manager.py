@@ -173,6 +173,8 @@ class RealTimePipelineManager:
                     "classification_confidence": tc["confidence"],
                     "predicted_congestion_score": cf["predicted_congestion_score"],
                     "predicted_congestion_class": cf["predicted_congestion_class"],
+                    "predicted_score": cf["predicted_congestion_score"],
+                    "predicted_class": cf["predicted_congestion_class"],
                     "congestion_confidence": cf["confidence"],
                     "cluster_id": prof["cluster_id"],
                     "profile_label": prof["profile_label"],

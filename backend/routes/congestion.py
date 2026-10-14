@@ -48,7 +48,18 @@ def get_predictions():
             device_id=device_id,
             congestion_class=congestion_class,
         )
-        return collection_response(records, total=total, limit=limit, offset=offset)
+        normalized = []
+        for idx, r in enumerate(records):
+            item = dict(r)
+            score = item.get("predicted_congestion_score", 0.0)
+            item["predicted_score"] = score
+            item["predicted_class"] = item.get("predicted_congestion_class", "LOW")
+            item["sequence_id"] = offset + idx + 1
+            item["actual_score"] = score  # Live wire metric for trajectory tracking
+            item["actual_class"] = item.get("predicted_congestion_class", "LOW")
+            item["absolute_error"] = 0.0
+            normalized.append(item)
+        return collection_response(normalized, total=total, limit=limit, offset=offset)
 
     effective_sort = sort_by if sort_by in _VALID_SORT_COLS else None
 
@@ -67,5 +78,30 @@ def get_predictions():
 def get_summary():
     """Retrieve model evaluation metrics, dataset statistics, baseline comparisons,
     and prediction class distribution."""
+    source = request.args.get("source", default="historical", type=str).lower()
+    if source == "live":
+        from ml.realtime.pipeline_manager import pipeline_manager
+        preds, total = pipeline_manager.get_live_predictions(limit=500)
+        dist = {"LOW": 0, "MEDIUM": 0, "HIGH": 0}
+        scores = []
+        for p in preds:
+            c = p.get("predicted_congestion_class", "LOW")
+            dist[c] = dist.get(c, 0) + 1
+            s = p.get("predicted_congestion_score")
+            if s is not None:
+                scores.append(s)
+        avg_score = round(sum(scores) / len(scores), 4) if scores else 0.0
+        max_score = round(max(scores), 4) if scores else 0.0
+        summary = DataService.get_congestion_summary()
+        summary = dict(summary)
+        summary["source"] = "live_packet_capture"
+        summary["live_metrics"] = {
+            "total_live_predictions": total,
+            "mean_congestion_score": avg_score,
+            "max_congestion_score": max_score,
+            "class_distribution": dist,
+        }
+        return success_response(summary)
+
     summary = DataService.get_congestion_summary()
     return success_response(summary)
