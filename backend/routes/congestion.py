@@ -48,7 +48,18 @@ def get_predictions():
             device_id=device_id,
             congestion_class=congestion_class,
         )
-        return collection_response(records, total=total, limit=limit, offset=offset)
+        normalized = []
+        for idx, r in enumerate(records):
+            item = dict(r)
+            score = item.get("predicted_congestion_score", 0.0)
+            item["predicted_score"] = score
+            item["predicted_class"] = item.get("predicted_congestion_class", "LOW")
+            item["sequence_id"] = offset + idx + 1
+            item["actual_score"] = score  # Live wire metric for trajectory tracking
+            item["actual_class"] = item.get("predicted_congestion_class", "LOW")
+            item["absolute_error"] = 0.0
+            normalized.append(item)
+        return collection_response(normalized, total=total, limit=limit, offset=offset)
 
     effective_sort = sort_by if sort_by in _VALID_SORT_COLS else None
 

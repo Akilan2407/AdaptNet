@@ -93,10 +93,13 @@ export function LineChart({
   let maxY = 1;
   data.forEach((d) => {
     series.forEach((s) => {
-      const v = Number(d[s.key]);
-      if (!isNaN(v)) {
-        if (v < minY) minY = v;
-        if (v > maxY) maxY = v;
+      const raw = d[s.key];
+      if (raw !== null && raw !== undefined) {
+        const v = Number(raw);
+        if (!isNaN(v)) {
+          if (v < minY) minY = v;
+          if (v > maxY) maxY = v;
+        }
       }
     });
   });
@@ -109,7 +112,9 @@ export function LineChart({
   const paths = series.map((s) => {
     const points = data
       .map((d, i) => {
-        const v = Number(d[s.key]);
+        const raw = d[s.key];
+        if (raw === null || raw === undefined) return null;
+        const v = Number(raw);
         if (isNaN(v)) return null;
         return `${getX(i)},${getY(v)}`;
       })
@@ -155,6 +160,7 @@ export function LineChart({
               fill="none"
               stroke={s.color}
               strokeWidth="2.5"
+              strokeDasharray={s.dashed ? '5 5' : undefined}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -164,7 +170,9 @@ export function LineChart({
           {data.map((d, i) => {
             const x = getX(i);
             return series.map((s) => {
-              const val = Number(d[s.key]);
+              const raw = d[s.key];
+              if (raw === null || raw === undefined) return null;
+              const val = Number(raw);
               if (isNaN(val)) return null;
               const y = getY(val);
               return (

@@ -59,60 +59,161 @@ export default function Congestion() {
   const metadata = summaryData?.model_metadata || {};
   const baselines = summaryData?.baseline_models || [];
 
-  // Line chart points for predictions vs actuals
-  const chartData = predictions.map((p, idx) => ({
-    label: `Seq #${p.sequence_id || idx + 1} (${p.device_id || 'h'})`,
-    actual_score: Number(p.actual_score !== undefined ? p.actual_score : p.y_true || 0),
-    predicted_score: Number(p.predicted_score !== undefined ? p.predicted_score : p.y_pred || 0),
-  }));
+  const isLive = dataSource === 'live';
 
-  const columns = [
-    {
-      key: 'sequence_id',
-      label: 'Seq ID',
-      width: '80px',
-      render: (val) => <span className="tabular-num">#{val}</span>,
-    },
-    {
-      key: 'device_id',
-      label: 'Host',
-      width: '80px',
-      render: (val) => <span className="device-tag">{val || '—'}</span>,
-    },
-    {
-      key: 'actual_score',
-      label: 'Actual Congestion',
-      render: (val) => (
-        <span className="tabular-num">{val !== undefined ? Number(val).toFixed(4) : '—'}</span>
-      ),
-    },
-    {
-      key: 'predicted_score',
-      label: 'GRU Predicted',
-      render: (val) => (
-        <span className="tabular-num text-cyan-accent">
-          {val !== undefined ? Number(val).toFixed(4) : '—'}
-        </span>
-      ),
-    },
-    {
-      key: 'absolute_error',
-      label: 'Absolute Error',
-      render: (val) => (
-        <span className="tabular-num">{val !== undefined ? Number(val).toFixed(4) : '—'}</span>
-      ),
-    },
-    {
-      key: 'actual_class',
-      label: 'Actual Level',
-      render: (val) => <StatusBadge type="priority" value={val} label={val} />,
-    },
-    {
-      key: 'predicted_class',
-      label: 'Predicted Level',
-      render: (val) => <StatusBadge type="priority" value={val} label={val} />,
-    },
-  ];
+  // Line chart points for predictions vs actuals
+  const chartData = predictions.map((p, idx) => {
+    const predVal = Number(
+      p.predicted_score !== undefined
+        ? p.predicted_score
+        : p.predicted_congestion_score !== undefined
+        ? p.predicted_congestion_score
+        : p.y_pred !== undefined
+        ? p.y_pred
+        : 0
+    );
+    const actVal = isLive
+      ? null
+      : Number(p.actual_score !== undefined ? p.actual_score : p.y_true !== undefined ? p.y_true : 0);
+
+    return {
+      label: isLive
+        ? (p.timestamp ? new Date(p.timestamp).toLocaleTimeString() : `Pkt #${idx + 1}`)
+        : `Seq #${p.sequence_id || idx + 1} (${p.device_id || 'h'})`,
+      actual_score: actVal,
+      predicted_score: predVal,
+      threshold: 0.67,
+    };
+  });
+
+  const columns = isLive
+    ? [
+        {
+          key: 'sequence_id',
+          label: 'Seq #',
+          width: '70px',
+          render: (val, row, idx) => <span className="tabular-num">#{val || idx + 1}</span>,
+        },
+        {
+          key: 'timestamp',
+          label: 'Time',
+          width: '100px',
+          render: (val) => (
+            <span className="tabular-num" style={{ fontSize: '0.8rem', color: '#78716c' }}>
+              {val ? new Date(val).toLocaleTimeString() : '—'}
+            </span>
+          ),
+        },
+        {
+          key: 'device_id',
+          label: 'Host / Flow',
+          render: (val, row) => (
+            <div>
+              <span className="device-tag">{val || 'live'}</span>
+              {row.traffic_class && (
+                <span className="class-badge" style={{ marginLeft: 6 }}>{row.traffic_class}</span>
+              )}
+            </div>
+          ),
+        },
+        {
+          key: 'predicted_score',
+          label: 'GRU Predicted Score',
+          render: (val, row) => {
+            const score = val !== undefined ? val : row.predicted_congestion_score;
+            return (
+              <span className="tabular-num font-semibold" style={{ color: '#d97706' }}>
+                {score !== undefined ? Number(score).toFixed(4) : '—'}
+              </span>
+            );
+          },
+        },
+        {
+          key: 'congestion_confidence',
+          label: 'Model Confidence',
+          render: (val) => (
+            <span className="tabular-num">
+              {val !== undefined ? `${(Number(val) * 100).toFixed(1)}%` : '—'}
+            </span>
+          ),
+        },
+        {
+          key: 'predicted_class',
+          label: 'Predicted Level',
+          render: (val, row) => {
+            const level = val || row.predicted_congestion_class || 'LOW';
+            return <StatusBadge type="priority" value={level} label={level} />;
+          },
+        },
+        {
+          key: 'final_priority',
+          label: 'QoS Action',
+          render: (val) => (
+            <StatusBadge type="priority" value={val || 'NORMAL'} label={val || 'NORMAL'} />
+          ),
+        },
+      ]
+    : [
+        {
+          key: 'sequence_id',
+          label: 'Seq ID',
+          width: '80px',
+          render: (val) => <span className="tabular-num">#{val}</span>,
+        },
+        {
+          key: 'device_id',
+          label: 'Host',
+          width: '80px',
+          render: (val) => <span className="device-tag">{val || '—'}</span>,
+        },
+        {
+          key: 'actual_score',
+          label: 'Actual Congestion',
+          render: (val) => (
+            <span className="tabular-num">{val !== undefined ? Number(val).toFixed(4) : '—'}</span>
+          ),
+        },
+        {
+          key: 'predicted_score',
+          label: 'GRU Predicted',
+          render: (val, row) => {
+            const score = val !== undefined ? val : row.predicted_congestion_score;
+            return (
+              <span className="tabular-num text-cyan-accent">
+                {score !== undefined ? Number(score).toFixed(4) : '—'}
+              </span>
+            );
+          },
+        },
+        {
+          key: 'absolute_error',
+          label: 'Absolute Error',
+          render: (val) => (
+            <span className="tabular-num">{val !== undefined ? Number(val).toFixed(4) : '—'}</span>
+          ),
+        },
+        {
+          key: 'actual_class',
+          label: 'Actual Level',
+          render: (val) => <StatusBadge type="priority" value={val} label={val} />,
+        },
+        {
+          key: 'predicted_class',
+          label: 'Predicted Level',
+          render: (val, row) => {
+            const level = val || row.predicted_congestion_class;
+            return <StatusBadge type="priority" value={level} label={level} />;
+          },
+        },
+      ];
+
+  // Helper for computing mean/max from live predictions if summaryData has not computed it yet
+  const liveScores = predictions
+    .map((p) => p.predicted_score !== undefined ? p.predicted_score : p.predicted_congestion_score)
+    .filter((s) => s !== undefined && s !== null)
+    .map(Number);
+  const liveMean = liveScores.length > 0 ? (liveScores.reduce((a, b) => a + b, 0) / liveScores.length).toFixed(4) : '0.0000';
+  const liveMax = liveScores.length > 0 ? Math.max(...liveScores).toFixed(4) : '0.0000';
 
   return (
     <div className="page-container">
@@ -153,16 +254,28 @@ export default function Congestion() {
       {/* Model KPI Cards */}
       <div className="stats-grid">
         <StatCard
-          title="Test MAE"
-          value={modelEval.mae !== undefined ? Number(modelEval.mae).toFixed(4) : '0.1245'}
-          subtext="Mean absolute error"
+          title={isLive ? "Mean Live Congestion" : "Test MAE"}
+          value={
+            isLive
+              ? (summaryData?.live_metrics?.mean_congestion_score !== undefined
+                  ? Number(summaryData.live_metrics.mean_congestion_score).toFixed(4)
+                  : liveMean)
+              : (modelEval.mae !== undefined ? Number(modelEval.mae).toFixed(4) : '0.1245')
+          }
+          subtext={isLive ? "Real-time rolling mean score" : "Mean absolute error"}
           icon={IconCongestion}
           accent="purple"
         />
         <StatCard
-          title="Test RMSE"
-          value={modelEval.rmse !== undefined ? Number(modelEval.rmse).toFixed(4) : '0.1852'}
-          subtext="Root mean squared error"
+          title={isLive ? "Peak Congestion Score" : "Test RMSE"}
+          value={
+            isLive
+              ? (summaryData?.live_metrics?.max_congestion_score !== undefined
+                  ? Number(summaryData.live_metrics.max_congestion_score).toFixed(4)
+                  : liveMax)
+              : (modelEval.rmse !== undefined ? Number(modelEval.rmse).toFixed(4) : '0.1852')
+          }
+          subtext={isLive ? "Highest recorded congestion" : "Root mean squared error"}
           icon={IconCongestion}
           accent="coral"
         />
@@ -185,12 +298,23 @@ export default function Congestion() {
       {/* Actual vs Predicted Sequential Chart */}
       <div className="content-card">
         <LineChart
-          title="GRU Forecast vs Ground-Truth Congestion Score"
+          title={
+            isLive
+              ? "Live Wire GRU Congestion Forecast vs Throttling Threshold"
+              : "GRU Forecast vs Ground-Truth Congestion Score"
+          }
           data={chartData}
-          series={[
-            { key: 'actual_score', name: 'Actual Ground Truth', color: '#059669' },
-            { key: 'predicted_score', name: 'GRU Predicted', color: '#d97706' },
-          ]}
+          series={
+            isLive
+              ? [
+                  { key: 'predicted_score', name: 'Live GRU Forecast Score', color: '#d97706' },
+                  { key: 'threshold', name: 'High Congestion Threshold (0.67)', color: '#dc2626', dashed: true },
+                ]
+              : [
+                  { key: 'actual_score', name: 'Actual Ground Truth', color: '#059669' },
+                  { key: 'predicted_score', name: 'GRU Predicted', color: '#d97706' },
+                ]
+          }
           unit="score"
           height={260}
         />
@@ -233,7 +357,7 @@ export default function Congestion() {
         <ErrorState message={error} onRetry={fetchCongestionData} />
       ) : (
         <div className="content-card">
-          <h3 className="card-heading">Test Prediction Records</h3>
+          <h3 className="card-heading">{isLive ? 'Live Wire GRU Inferences' : 'Test Prediction Records'}</h3>
           <DataTable
             columns={columns}
             data={predictions}
