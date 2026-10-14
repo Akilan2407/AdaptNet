@@ -6,6 +6,7 @@ On Linux:  Uses AF_PACKET / SOCK_RAW (ETH_P_ALL) to capture raw Ethernet frames.
 
 On macOS:  Uses AF_INET / SOCK_RAW / IPPROTO_TCP + IPPROTO_UDP via separate sockets,
            falling back to scapy if available.
+On Windows: Uses scapy/WinPcap or Npcap for cross-platform packet capture.
 
 Parses headers at each OSI layer:
   Layer 2 — Ethernet (dst/src MAC, EtherType)
@@ -439,7 +440,7 @@ def create_capture_socket() -> Tuple[Optional[socket.socket], bool, str]:
         return None, False, "AF_INET raw socket failed — run as root"
 
     else:
-        return None, False, f"Unsupported platform: {os_name}"
+        return None, False, f"Use scapy on {os_name}; install Npcap for live capture"
 
 
 # ──────────────────────────────────────────────────────────────────────────────

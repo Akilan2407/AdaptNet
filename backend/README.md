@@ -101,6 +101,12 @@ source .venv/bin/activate
 pip install -r backend/requirements.txt
 ```
 
+On Windows PowerShell, activate the environment with:
+```powershell
+.\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements.txt
+```
+
 ### 2. Run the Development Server
 
 Start the REST API server:

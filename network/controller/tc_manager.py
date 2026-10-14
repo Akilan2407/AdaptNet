@@ -1,4 +1,4 @@
-"""Linux tc subsystem wrapper and HTB hierarchy manager (converted from tc_manager.h/.c)."""
+"""Linux tc subsystem wrapper and safe simulation fallback for other platforms."""
 
 from dataclasses import dataclass
 import platform
@@ -76,7 +76,7 @@ def parse_priority_string(s: Optional[str]) -> PriorityLevel:
 
 
 def _execute_or_simulate_cmd(cmd: str, dry_run: bool) -> Tuple[int, str]:
-    """Execute shell command on Linux or simulate on Darwin/macOS."""
+    """Execute tc on Linux or simulate it on platforms without Linux tc."""
     if dry_run:
         return 0, ""
 
@@ -90,7 +90,7 @@ def _execute_or_simulate_cmd(cmd: str, dry_run: bool) -> Tuple[int, str]:
         except Exception as exc:
             return -1, str(exc)
     else:
-        return 0, "tc is Linux-only; simulated execution on Darwin"
+        return 0, f"tc is Linux-only on {platform.system()}; simulated execution"
 
 
 def tc_init_interface(interface: str, dry_run: bool) -> Tuple[bool, TCOperationResult]:
