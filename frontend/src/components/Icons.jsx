@@ -133,3 +133,14 @@ export const IconClose = ({ size = 16, color = 'currentColor' }) => (
     <line x1="6" y1="6" x2="18" y2="18"></line>
   </svg>
 );
+
+export const IconLiveCapture = ({ size = 18, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M4.93 4.93a10 10 0 0 0 0 14.14"></path>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+    <path d="M7.76 7.76a6 6 0 0 0 0 8.48"></path>
+    <path d="M16.24 7.76a6 6 0 0 1 0 8.48"></path>
+  </svg>
+);
+

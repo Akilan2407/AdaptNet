@@ -28,6 +28,7 @@ from backend.routes.traces import traces_bp
 from backend.routes.explainability import explainability_bp
 from backend.routes.explanations import explanations_bp
 from backend.routes.stats import stats_bp
+from backend.routes.live_capture import live_capture_bp
 
 
 def create_app(config_class=Config) -> Flask:
@@ -43,6 +44,7 @@ def create_app(config_class=Config) -> Flask:
 
     app.register_blueprint(health_bp, url_prefix=prefix)
     app.register_blueprint(monitoring_bp, url_prefix=f"{prefix}/monitoring")
+    app.register_blueprint(live_capture_bp, url_prefix=f"{prefix}/live")
     app.register_blueprint(profiling_bp, url_prefix=f"{prefix}/profiling")
     app.register_blueprint(congestion_bp, url_prefix=f"{prefix}/congestion")
     app.register_blueprint(classification_bp, url_prefix=f"{prefix}/classification")
@@ -59,12 +61,18 @@ def create_app(config_class=Config) -> Flask:
         """Root API metadata and endpoint directory."""
         return success_response({
             "service": "Adaptive Network Traffic Management REST API",
-            "version": "1.1.0",
-            "phase": "Phase 18 - Backend REST API Module (Improved)",
+            "version": "1.2.0",
+            "phase": "Live Packet Capture Integration",
             "documentation": f"{prefix}/health",
             "endpoints": [
                 f"{prefix}/health",
                 f"{prefix}/stats",
+                f"{prefix}/live/packets",
+                f"{prefix}/live/stats",
+                f"{prefix}/live/start",
+                f"{prefix}/live/stop",
+                f"{prefix}/live/clear",
+                f"{prefix}/live/interfaces",
                 f"{prefix}/monitoring/flows",
                 f"{prefix}/monitoring/summary",
                 f"{prefix}/monitoring/search",

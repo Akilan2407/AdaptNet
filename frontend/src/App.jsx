@@ -17,6 +17,7 @@ import {
 // View Pages
 import Dashboard from './pages/Dashboard';
 import Monitoring from './pages/Monitoring';
+import LiveCapture from './pages/LiveCapture';
 import Profiling from './pages/Profiling';
 import Classification from './pages/Classification';
 import Congestion from './pages/Congestion';
@@ -66,6 +67,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/monitoring" element={<Monitoring />} />
+              <Route path="/live" element={<LiveCapture />} />
               <Route path="/profiling" element={<Profiling />} />
               <Route path="/classification" element={<Classification />} />
               <Route path="/congestion" element={<Congestion />} />

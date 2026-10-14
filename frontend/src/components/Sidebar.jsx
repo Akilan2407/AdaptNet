@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import {
   IconDashboard,
   IconMonitoring,
+  IconLiveCapture,
   IconProfiling,
   IconClassification,
   IconCongestion,
@@ -80,6 +81,7 @@ const prefetchMap = {
 const navItems = [
   { path: '/', label: 'Overview', icon: IconDashboard, section: 'Core' },
   { path: '/monitoring', label: 'Telemetry Monitoring', icon: IconMonitoring, section: 'Data Collection' },
+  { path: '/live', label: 'Live Wire Sniffer', icon: IconLiveCapture, section: 'Data Collection' },
   { path: '/profiling', label: 'Device Profiling', icon: IconProfiling, section: 'Data Collection' },
   { path: '/classification', label: 'Traffic Classification', icon: IconClassification, section: 'Intelligence' },
   { path: '/congestion', label: 'Congestion Forecast', icon: IconCongestion, section: 'Intelligence' },

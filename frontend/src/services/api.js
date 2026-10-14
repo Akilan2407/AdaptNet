@@ -203,4 +203,13 @@ export const getExplanationById = (traceId, options = {}) =>
 export const getExplanationSummary = (options = {}) =>
   cachedGet('/explanations/summary', {}, options);
 
+// 11. Live Packet Capture Endpoints (Direct real-time wire calls)
+export const getLiveStats = () => apiClient.get('/live/stats');
+export const getLivePackets = (params = {}) => apiClient.get('/live/packets', { params });
+export const startLiveCapture = (data = {}) => apiClient.post('/live/start', data);
+export const stopLiveCapture = () => apiClient.post('/live/stop');
+export const clearLivePackets = () => apiClient.post('/live/clear');
+export const getLiveInterfaces = () => apiClient.get('/live/interfaces');
+
 export default apiClient;
+
