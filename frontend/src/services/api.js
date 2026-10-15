@@ -80,30 +80,49 @@ export const clearApiCache = () => {
 };
 
 /**
+ * Helper to flexibly normalize (params, options) vs (options) calls.
+ */
+function resolveParamsAndOptions(arg1 = {}, arg2 = {}) {
+  if (arg1 && ('forceRefresh' in arg1 || 'ttl' in arg1) && Object.keys(arg2).length === 0) {
+    return { params: {}, options: arg1 };
+  }
+  return { params: arg1 || {}, options: arg2 || {} };
+}
+
+/**
  * Cached GET wrapper supporting instant cache returns and deduplicated in-flight requests.
  */
 export async function cachedGet(url, params = {}, options = {}) {
-  const { forceRefresh = false, ttl = DEFAULT_TTL_MS } = options;
-  const key = getCacheKey(url, params);
+  const norm = resolveParamsAndOptions(params, options);
+  let cleanParams = { ...norm.params };
+  const isForce = Boolean(norm.options?.forceRefresh || cleanParams?.forceRefresh);
+  const ttl = norm.options?.ttl || DEFAULT_TTL_MS;
+
+  if ('forceRefresh' in cleanParams) {
+    delete cleanParams.forceRefresh;
+  }
+
+  const key = getCacheKey(url, cleanParams);
   const now = Date.now();
   const cached = memoryCache.get(key);
 
-  // If manual refresh requested, bust in-memory cache completely
-  if (forceRefresh) {
+  // If manual refresh requested, bust in-memory cache completely for this key and URL
+  if (isForce) {
     memoryCache.delete(key);
+    invalidateCache(url);
   } else if (cached && cached.data && now - cached.timestamp < ttl) {
     // Return cached data immediately if fresh and not force-refreshing
     return cached.data;
   }
 
   // Deduplicate in-flight promises (only when not force-refreshing)
-  if (!forceRefresh && cached && cached.promise) {
+  if (!isForce && cached && cached.promise) {
     return cached.promise;
   }
 
   const reqConfig = {
-    params: forceRefresh ? { ...params, _t: now } : params,
-    headers: forceRefresh
+    params: isForce ? { ...cleanParams, _t: now } : cleanParams,
+    headers: isForce
       ? { 'Cache-Control': 'no-cache, no-store, must-revalidate', Pragma: 'no-cache' }
       : {},
   };
@@ -142,66 +161,104 @@ export const getHealth = (options = {}) =>
   cachedGet('/health', {}, { ttl: 10000, ...options });
 
 // 2. Monitoring Endpoints
-export const getMonitoringFlows = (params = {}, options = {}) =>
-  cachedGet('/monitoring/flows', params, options);
-export const getMonitoringSummary = (options = {}) =>
-  cachedGet('/monitoring/summary', {}, options);
+export const getMonitoringFlows = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/monitoring/flows', p, opt);
+};
+export const getMonitoringSummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/monitoring/summary', p, opt);
+};
 
 // 3. Profiling Endpoints
-export const getProfilingBehaviors = (params = {}, options = {}) =>
-  cachedGet('/profiling/behaviors', params, options);
-export const getProfilingClusters = (options = {}) =>
-  cachedGet('/profiling/clusters', {}, options);
+export const getProfilingBehaviors = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/profiling/behaviors', p, opt);
+};
+export const getProfilingClusters = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/profiling/clusters', p, opt);
+};
 
 // 4. Congestion Prediction Endpoints
-export const getCongestionPredictions = (params = {}, options = {}) =>
-  cachedGet('/congestion/predictions', params, options);
-export const getCongestionSummary = (options = {}) =>
-  cachedGet('/congestion/summary', {}, options);
+export const getCongestionPredictions = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/congestion/predictions', p, opt);
+};
+export const getCongestionSummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/congestion/summary', p, opt);
+};
 
 // 5. Traffic Classification Endpoints
-export const getClassificationFlows = (params = {}, options = {}) =>
-  cachedGet('/classification/flows', params, options);
-export const getClassificationSummary = (options = {}) =>
-  cachedGet('/classification/summary', {}, options);
+export const getClassificationFlows = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/classification/flows', p, opt);
+};
+export const getClassificationSummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/classification/summary', p, opt);
+};
 
 // 6. QoS Policy Endpoints
-export const getPolicyDecisions = (params = {}, options = {}) =>
-  cachedGet('/policy/decisions', params, options);
-export const getPolicySummary = (options = {}) =>
-  cachedGet('/policy/summary', {}, options);
+export const getPolicyDecisions = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/policy/decisions', p, opt);
+};
+export const getPolicySummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/policy/summary', p, opt);
+};
 
 // 7. Adaptive Traffic Control Endpoints
-export const getControlActions = (params = {}, options = {}) =>
-  cachedGet('/control/actions', params, options);
-export const getControlState = (params = {}, options = {}) =>
-  cachedGet('/control/state', params, options);
-export const getControlSummary = (options = {}) =>
-  cachedGet('/control/summary', {}, options);
+export const getControlActions = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/control/actions', p, opt);
+};
+export const getControlState = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/control/state', p, opt);
+};
+export const getControlSummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/control/summary', p, opt);
+};
 
 // 8. Decision Traces Endpoints
-export const getTraces = (params = {}, options = {}) =>
-  cachedGet('/traces', params, options);
+export const getTraces = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/traces', p, opt);
+};
 export const getTraceById = (traceId, options = {}) =>
   cachedGet(`/traces/${encodeURIComponent(traceId)}`, {}, options);
-export const getTraceSummary = (options = {}) =>
-  cachedGet('/traces/summary', {}, options);
+export const getTraceSummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/traces/summary', p, opt);
+};
 
 // 9. SHAP Explainability Endpoints
-export const getExplainabilityLocal = (params = {}, options = {}) =>
-  cachedGet('/explainability/local', params, options);
+export const getExplainabilityLocal = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/explainability/local', p, opt);
+};
 export const getExplainabilityGlobal = (options = {}) =>
   cachedGet('/explainability/global', {}, options);
-export const getExplainabilitySummary = (options = {}) =>
-  cachedGet('/explainability/summary', {}, options);
+export const getExplainabilitySummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/explainability/summary', p, opt);
+};
 
 // 10. Natural-Language Explanations Endpoints
-export const getExplanations = (params = {}, options = {}) =>
-  cachedGet('/explanations', params, options);
+export const getExplanations = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/explanations', p, opt);
+};
 export const getExplanationById = (traceId, options = {}) =>
   cachedGet(`/explanations/${encodeURIComponent(traceId)}`, {}, options);
-export const getExplanationSummary = (options = {}) =>
-  cachedGet('/explanations/summary', {}, options);
+export const getExplanationSummary = (params = {}, options = {}) => {
+  const { params: p, options: opt } = resolveParamsAndOptions(params, options);
+  return cachedGet('/explanations/summary', p, opt);
+};
 
 // 11. Live Packet Capture Endpoints (Direct real-time wire calls)
 export const getLiveStats = () => apiClient.get('/live/stats');

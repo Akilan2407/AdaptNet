@@ -3,6 +3,7 @@ import { getClassificationFlows, getClassificationSummary, getCachedData } from 
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import RefreshButton from '../components/RefreshButton';
+import DataSourceToggle from '../components/DataSourceToggle';
 import StatusBadge from '../components/StatusBadge';
 import { DonutChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
@@ -14,6 +15,7 @@ export default function Classification() {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(15);
   const [classFilter, setClassFilter] = useState('');
+  const [dataSource, setDataSource] = useState('historical'); // 'historical' | 'live'
 
   const [flows, setFlows] = useState(() => getCachedData('/classification/flows', { limit: 15, offset: 0 })?.data || []);
   const [summaryData, setSummaryData] = useState(() => getCachedData('/classification/summary'));
@@ -30,12 +32,13 @@ export default function Classification() {
       const params = {
         limit: pageSize,
         offset: page * pageSize,
+        source: dataSource,
       };
       if (classFilter) params.traffic_class = classFilter;
 
       const [flowsRes, summaryRes] = await Promise.all([
         getClassificationFlows(params, { forceRefresh: force }),
-        getClassificationSummary({ forceRefresh: force }).catch(() => null),
+        getClassificationSummary({ source: dataSource }, { forceRefresh: force }).catch(() => null),
       ]);
 
       setFlows(flowsRes.data || []);
@@ -46,7 +49,7 @@ export default function Classification() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, classFilter, flows.length]);
+  }, [page, pageSize, classFilter, dataSource, flows.length]);
 
   useEffect(() => {
     fetchClassificationData();
@@ -125,6 +128,14 @@ export default function Classification() {
         </div>
 
         <div className="header-actions">
+          <DataSourceToggle
+            value={dataSource}
+            onChange={(src) => {
+              setDataSource(src);
+              setPage(0);
+            }}
+          />
+
           {/* Class Filter */}
           <select
             value={classFilter}
@@ -140,6 +151,7 @@ export default function Classification() {
             <option value="VOIP">VOIP</option>
             <option value="WEB_BROWSING">WEB_BROWSING</option>
             <option value="DNS">DNS</option>
+            <option value="OTHER">OTHER</option>
           </select>
 
           <RefreshButton onRefresh={fetchClassificationData} />

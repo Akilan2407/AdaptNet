@@ -74,5 +74,24 @@ def get_decisions():
 @policy_bp.route("/summary", methods=["GET"])
 def get_summary():
     """Retrieve QoS policy decision distribution, rule statistics, and live rule usage."""
+    source = request.args.get("source", default="historical", type=str).lower()
+    if source == "live":
+        from ml.realtime.pipeline_manager import pipeline_manager
+        preds, total = pipeline_manager.get_live_predictions(limit=500)
+        dist = {"CRITICAL": 0, "HIGH": 0, "NORMAL": 0, "LOW": 0}
+        rules_used = {}
+        for p in preds:
+            pri = p.get("final_priority", "NORMAL")
+            dist[pri] = dist.get(pri, 0) + 1
+            rid = p.get("rule_id", "POLICY_DEFAULT")
+            rules_used[rid] = rules_used.get(rid, 0) + 1
+        return success_response({
+            "source": "live_packet_capture",
+            "total_decisions": total,
+            "priority_distribution": dist,
+            "rule_usage": rules_used,
+            "active_rules_count": len(rules_used),
+        })
+
     summary = DataService.get_policy_summary()
     return success_response(summary)

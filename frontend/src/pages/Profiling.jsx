@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getProfilingBehaviors, getProfilingClusters, getCachedData } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
 import RefreshButton from '../components/RefreshButton';
+import DataSourceToggle from '../components/DataSourceToggle';
 import StatusBadge from '../components/StatusBadge';
 import { BarChart } from '../components/Charts';
 import LoadingState from '../components/LoadingState';
@@ -11,20 +12,21 @@ import { IconProfiling } from '../components/Icons';
 import { formatMbps, formatPercent } from '../utils/formatters';
 
 export default function Profiling() {
+  const [dataSource, setDataSource] = useState('historical'); // 'historical' | 'live'
   const [behaviors, setBehaviors] = useState(() => getCachedData('/profiling/behaviors')?.data || []);
   const [clustersInfo, setClustersInfo] = useState(() => getCachedData('/profiling/clusters'));
   const hasCache = Boolean(behaviors.length || clustersInfo);
   const [loading, setLoading] = useState(!hasCache);
   const [error, setError] = useState(null);
 
-  const fetchProfilingData = async (force = false) => {
+  const fetchProfilingData = useCallback(async (force = false) => {
     if (!behaviors.length || force) {
       setLoading(true);
     }
     setError(null);
     try {
       const [behaviorsRes, clustersRes] = await Promise.all([
-        getProfilingBehaviors({}, { forceRefresh: force }),
+        getProfilingBehaviors({ source: dataSource }, { forceRefresh: force }),
         getProfilingClusters({ forceRefresh: force }),
       ]);
 
@@ -35,11 +37,11 @@ export default function Profiling() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dataSource, behaviors.length]);
 
   useEffect(() => {
-    fetchProfilingData(false);
-  }, []);
+    fetchProfilingData();
+  }, [fetchProfilingData]);
 
   if (loading && !behaviors.length) return <LoadingState message="Loading device behavioral profiles..." />;
   if (error && !behaviors.length) return <ErrorState message={error} onRetry={() => fetchProfilingData(true)} />;
@@ -100,7 +102,13 @@ export default function Profiling() {
         <div>
           <h2 className="page-title">Device & User Behavior Profiling</h2>
         </div>
-        <RefreshButton onRefresh={fetchProfilingData} />
+        <div className="header-actions">
+          <DataSourceToggle
+            value={dataSource}
+            onChange={(src) => setDataSource(src)}
+          />
+          <RefreshButton onRefresh={fetchProfilingData} />
+        </div>
       </div>
 
       {/* Profiling Evaluation Stats */}

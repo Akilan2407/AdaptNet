@@ -239,9 +239,9 @@ export default function Explanations() {
                       value={selectedExp.policy_decision?.priority || 'LOW'}
                     />
                   </div>
-                  <div className="mini-stage-card">
+                  <div className="mini-stage-card mini-stage-card-wide">
                     <span className="mini-stage-badge">Policy Rule</span>
-                    <code>
+                    <code title={selectedExp.policy_decision?.rule_id || 'POLICY_UNKNOWN_CONGESTION_FALLBACK'}>
                       {selectedExp.policy_decision?.rule_id ||
                         'POLICY_UNKNOWN_CONGESTION_FALLBACK'}
                     </code>
